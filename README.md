@@ -4,8 +4,8 @@
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
 **Version**: 1.3.0 (2026-04-18)
-**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 202+ 페이지 운영 경험 기반
-**Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장
+**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 216+ 페이지 운영 경험 기반
+**Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장 + LightRAG (HKUDS, EMNLP2025) 트리플렛/리랭킹 차용
 
 ---
 
@@ -95,10 +95,12 @@ git init && echo ".venv/\nraw/extracted/" > .gitignore
 
 | 워크플로우 | 트리거 | 핵심 동작 |
 |------------|--------|-----------|
-| **Ingest** | 새 소스 추가 | 요약 생성 → 엔티티/개념 업데이트 → 온톨로지 APPEND |
-| **Query** | 질문 | 인덱스+온톨로지 탐색 → 합성 답변 → 갭 반영 |
+| **Ingest** | 새 소스 추가 | 트리플렛 추출 (LightRAG) → 요약 생성 → 엔티티/개념 업데이트 → 온톨로지 APPEND |
+| **Query** | 질문 | 5-Route 탐색 → Relevance Scoring (LightRAG) → 합성 답변 |
 | **Lint** | 주기적 | 모순/고아/갭 검사 → gap-analysis.md 갱신 |
 | **Ontology Update** | 대규모 변경 후 | 클러스터-갭 재분석 → overview.md 갱신 |
+
+> **v1.3.0 신규 프로토콜** — Ingest 시 `(주체, 관계, 객체)` 트리플렛을 ENTITIES/RELATIONS YAML 형식으로 먼저 추출 → 온톨로지 자동 APPEND. Query 시 후보 페이지 6개 이상이면 메타데이터 기반 7개 기준(제목/태그/타입/최신성/소스/중심성/백링크) 점수화로 토큰 절감.
 
 ---
 
