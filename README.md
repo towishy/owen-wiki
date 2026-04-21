@@ -3,11 +3,42 @@
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.3.0 (2026-04-18)
+**Version**: 1.4.0 (2026-04-18)
+
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 216+ 페이지 운영 경험 기반
+
 **Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장 + LightRAG (HKUDS, EMNLP2025) 트리플렛/리랭킹 차용
 
 ---
+
+
+## 5가지 핵심 특징
+
+1. **🤖 LLM-Native KB** — AGENTS.md 하나로 인제스트·질의·점검·온톨로지·산출물까지 자율 운영. 사람은 raw 입력과 outputs 검토만.
+2. **📂 3-Layer 분리** — `raw/`(불변 입력) → `wiki/`(LLM 정제) → `outputs/`(공동 산출). 책임 경계가 깔끔.
+3. **🕸️ 온톨로지 + 갭 분석** — 위키링크와 별개로 `[[A]] [관계] [[B]]` 트리플렛을 `wiki/ontology/`에 누적. 클러스터·허브·갭을 데이터로 파악.
+4. **📊 운영 검증된 스케일** — 294 페이지 / 3,853 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / git 63커밋 / log 71항목 — 모두 실측.
+5. **📦 재사용 가능한 템플릿 킷** — [Owen-WIKI/](outputs/Owen-WIKI/)로 누구나 같은 구조의 LLM Wiki 구축 가능 (외부 git 저장소와 이중 동기화).
+
+---
+
+## 장점 한눈에 보기
+
+| 영역 | 장점 | 메커니즘 |
+|------|------|---------|
+| **신뢰도** | 페이지마다 출처 풍부도 추적 | `confidence` 0.0~1.0 (5단계 가이드) |
+| **라이프사이클** | 옛 정보 자동 분류 | `last_confirmed`/`stale_after` + 90/180일 aging/stale |
+| **버전 관리** | 옛 페이지 명시적 대체 | `supersedes`/`superseded_by` + 산출물 자동 신버전 권장 |
+| **개인정보 보호** | 인제스트 0단계 PII 차단 | [sanitize-ingest.py](scripts/sanitize-ingest.py) 9패턴 |
+| **검색 효율** | 토큰 절감 답변 | 5-Route 전략 + 9기준 Relevance Scoring |
+| **인제스트 정밀도** | 트리플렛 구조 추출 | LightRAG 차용 ENTITIES/RELATIONS YAML |
+| **인덱싱 비용** | 파일 추가 시 ~50 토큰 | 2-tier + Smart Diff 3-tier 전략 |
+| **무결성** | 5종 lint 자동화 | tags / ontology / orphans / broken-links / confidence-decay |
+| **도메인 깊이** | MS Security 100% | 5축 태그 체계 556종 |
+| **산출물 다양성** | KB 외 PPTX/DOCX/HTML/Mermaid | [outputs/](outputs/) 4종 카테고리 |
+| **외부 자료 흡수** | PPTX/PDF/DOCX/XLSX → MD | markitdown 1차 + 폴백 다중 엔진 |
+| **감사·롤백** | 모든 작업 추적 | git + log.md append-only + raw 불변 원칙 |
+
 
 ## 이 킷에 포함된 파일
 
