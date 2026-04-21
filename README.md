@@ -102,6 +102,8 @@ git init && echo ".venv/\nraw/extracted/" > .gitignore
 
 > **v1.3.0 신규 프로토콜** — Ingest 시 `(주체, 관계, 객체)` 트리플렛을 ENTITIES/RELATIONS YAML 형식으로 먼저 추출 → 온톨로지 자동 APPEND. Query 시 후보 페이지 6개 이상이면 메타데이터 기반 7개 기준(제목/태그/타입/최신성/소스/중심성/백링크) 점수화로 토큰 절감.
 
+> **v1.4.0 신규 라이프사이클** — YAML 프론트매터에 `confidence` (0~1), `last_confirmed`, `stale_after`, `supersedes`, `superseded_by` 5개 필드 추가. Ingest 0단계에 PII 사전 점검(`scripts/sanitize-ingest.py`) 도입. Lint 시 `scripts/check-confidence-decay.py`로 90일 aging / 180일 stale 자동 분류. Relevance Scoring에 신뢰도 가중과 노후 페널티 반영.
+
 ---
 
 ## 버전 호환

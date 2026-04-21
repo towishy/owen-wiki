@@ -5,6 +5,42 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.4.0] — 2026-04-21
+
+### Confidence/Provenance 필드 + Supersession + PII 사전 점검
+
+rohitg00/llm-wiki v2 분석을 바탕으로 운영 안정성을 강화하는 3가지 라이프사이클 메커니즘 도입.
+
+**변경사항:**
+- `templates/*.md` 5종: YAML 프론트매터에 `confidence`, `last_confirmed`, `stale_after`, `supersedes`, `superseded_by` 5개 필드 추가 (선택, 신규 페이지부터 권장)
+- `AGENTS.md` · 페이지 컨벤션: **Confidence Scoring 가이드** 표(0.0~1.0 5단계), **Last Confirmed / Stale After 규칙** (90일 aging / 180일 stale), **Supersession 규칙** 신설
+- `AGENTS.md` · Ingest 워크플로우:
+  - 0단계 **PII 사전 점검** 추가 (sanitize-ingest.py)
+  - 7단계 **supersedes/superseded_by 프론트매터 기록** 추가 (총 9 → 10단계)
+- `AGENTS.md` · Query Relevance Scoring:
+  - 신뢰도(+2 / +1) 항목 추가
+  - 노후 페널티(aging −1 / stale −3) 추가
+  - superseded_by 보유 페이지 자동 후순위
+- `AGENTS.md` · Lint 워크플로우: 노후 점검(7) + PII 점검(8) 단계 추가 (총 9 → 11단계)
+- `AGENTS.md` · 트리플렛 추출 프로토콜: 관계 코드에 `supersedes`, `superseded-by` 추가
+- `scripts/check-confidence-decay.py` (신규): last_confirmed/updated 기반 aging/stale 자동 분류, `--apply`로 태그 자동 부여
+- `scripts/sanitize-ingest.py` (신규): EMAIL/IPv4/IPv6/GUID/JWT/Bearer/AWS Key/한국 RRN/전화번호/Azure SAS 9개 패턴 탐지, MS 공식 도메인 화이트리스트, `--mask`로 마스킹 사본 생성
+- `scripts/wiki-stats.py`: confidence 분포 5버킷 + superseded/aging/stale 카운트 추가
+- `README.md`: 버전 1.4.0
+
+**도입 이유:**
+- **Confidence**: 모든 페이지가 동등한 권위로 취급되던 한계 해소. Microsoft 공식 vs 추정 정보 구분.
+- **Supersession**: 자주 갱신되는 MS 제품 정보의 옛 버전을 명시적으로 추적, 산출물에서 자동 신버전 권장.
+- **PII 필터**: 컨설팅 도메인(`raw/security-onsite-reports/` 4,392 파일) 인제스트 시 고객 정보 사전 차단.
+- **노후곡선**: 1년 전 정보와 어제 정보의 동등 가중 문제 해소.
+
+**rohitg00 v2와의 차이:**
+- v2는 자동 망각·decay score 계산까지 제안 → Owen은 단순 임계 분류(90/180일)로 시작
+- Working/Episodic/Semantic/Procedural 메모리 4계층은 미도입 (현재 raw/wiki/outputs 3계층 유지)
+- Auto-crystallization, Self-healing lint 모순 탐지는 다음 버전(v1.5+)으로 보류
+
+---
+
 ## [1.3.0] — 2026-04-18
 
 ### LightRAG 차용 워크플로우 도입 (트리플렛 추출 + Relevance Scoring)

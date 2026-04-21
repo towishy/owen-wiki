@@ -5,6 +5,11 @@ tags: []
 sources: ["{{source_path}}"]
 created: {{date}}
 updated: {{date}}
+confidence: 0.8              # 단일 소스 기반 요약은 0.7~0.8 권장
+last_confirmed: {{date}}
+stale_after: ""
+supersedes: []
+superseded_by: ""
 ---
 
 # {{title}} 요약

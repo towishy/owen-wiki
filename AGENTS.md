@@ -2,15 +2,13 @@
 
 > 이 파일은 LLM 에이전트가 위키를 관리할 때 따라야 할 규칙과 컨벤션을 정의한다.
 > 사용자와 LLM이 함께 발전시켜 나가는 설정 파일이다.
->
-> **Owen-WIKI Template v1.3.0** — {{YOUR_NAME}}의 도메인에 맞게 수정하여 사용.
 
 ---
 
 ## 볼트 구조
 
 ```
-{{PROJECT_ROOT}}/
+/Users/owen/Work/WIKI/
 ├── AGENTS.md              ← 이 파일 (스키마)
 ├── index.md               ← 위키 전체 페이지 카탈로그
 ├── log.md                 ← 시간순 작업 기록
@@ -18,8 +16,18 @@
 │   ├── assets/            ← 이미지, CSV 등 첨부파일
 │   ├── articles/          ← 웹 클리핑 기사
 │   ├── papers/            ← 논문
-│   ├── notes/             ← 수기 메모, 회의록
-│   └── extracted/         ← 바이너리→마크다운 추출 결과
+│   ├── notes/             ← 수기 메모, 주간 보고
+│   │   └── owen-md/       ← Owen 지식 베이스 통합 마크다운 (5개 카테고리)
+│   ├── obsidian/ → symlink ← Owen Obsidian 볼트 (md 2,521 + 첨부 11,979)
+│   │   ├── EDE/           ← 고객사별 엔지니어링 지원
+│   │   ├── Security/      ← 보안 제품별 기술 문서
+│   │   ├── On-Prem/       ← 온프레미스 인프라
+│   │   ├── Reports/       ← 분기별 보고서
+│   │   ├── VBD/           ← 워크숍, Assessment
+│   │   └── copilot/       ← Copilot 관련 자료
+│   ├── security-onsite-reports/ → symlink ← 고객 현장 지원 기록 (88 프로젝트, 4,392 파일)
+│   ├── security-microsoft-documents/ → symlink ← MS 보안 교육/공식 문서 (141 주제, 3,510 파일)
+│   └── extracted/         ← 바이너리→마크다운 추출 결과 (scripts/extract-raw-sources.py)
 ├── wiki/                  ← LLM이 관리하는 위키 페이지 + 온톨로지
 │   ├── entities/          ← 인물, 조직, 도구 등
 │   ├── concepts/          ← 개념, 이론, 프레임워크
@@ -34,11 +42,12 @@
 │       ├── full-wiki-ontology.md    ← 전체 위키 통합 온톨로지
 │       └── gap-analysis.md          ← 최근 갭 분석 결과
 ├── outputs/               ← 최종 산출물 (발표, 보고서, 워크숍 등)
-│   ├── presentations/     ← 슬라이드
-│   ├── reports/           ← 보고서
-│   ├── workshops/         ← 워크숍 자료
+│   ├── presentations/     ← Marp 슬라이드, PPTX 요약
+│   ├── reports/           ← 고객 보고서, 분기 리포트
+│   ├── workshops/         ← 워크숍, VBD 자료
 │   └── drafts/            ← 작성 중인 산출물
-├── scripts/               ← 유틸리티 스크립트
+├── Owen-WIKI/             ← 재사용 가능한 LLM Wiki 템플릿 킷
+├── scripts/               ← 유틸리티 스크립트 (Python/PowerShell)
 └── templates/             ← 페이지 템플릿
 ```
 
@@ -68,6 +77,7 @@
 - 카테고리별 온톨로지 파일 + 전체 통합 온톨로지 + 갭 분석 결과로 구성한다
 - **증분 업데이트 원칙**: 절대 전체 재생성하지 않는다. 새 관계만 APPEND, 무효 관계만 제거한다
 - 갭 분석 결과는 다음 Ingest/Lint의 우선순위를 결정한다
+- 상세 설계: [[ontology-graph-layer]]
 
 ### Schema (`AGENTS.md`)
 - 사용자와 LLM이 공동으로 진화시킨다
@@ -94,8 +104,36 @@ tags: [prod/mde, type/summary, topic/zero-trust, customer/현대자동차]
 sources: ["소스 파일 경로"]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
+# --- v1.4.0+ 신뢰도 & 라이프사이클 (선택, 신규 페이지부터 권장) ---
+confidence: 0.85           # 0.0~1.0 — 출처 풍부도·검증도 기반
+last_confirmed: YYYY-MM-DD # 마지막으로 사실을 검증한 날
+stale_after: YYYY-MM-DD    # (선택) 자동 stale 표시 시점
+supersedes: [[옛페이지]]    # (선택) 이 페이지가 대체한 옛 페이지
+superseded_by: [[새페이지]] # (선택) 이 페이지를 대체한 새 페이지
 ---
 ```
+
+**Confidence Scoring 가이드:**
+
+| 값 | 의미 | 적용 예시 |
+|----|------|---------|
+| 0.95–1.0 | Microsoft 공식 문서 + 직접 검증 | MS Learn 인용 + 실험 검증 |
+| 0.80–0.94 | 1차 소스 (공식 블로그, 공식 PPT) | MTUB, Ignite 세션 |
+| 0.65–0.79 | 2차 소스 (요약, 번역, 분석) | summaries/, 번역 페이지 |
+| 0.40–0.64 | 추정·종합 | 개인 메모, 베타 정보 |
+| <0.40 | 미검증·draft | 작성 중 페이지 |
+
+**Last Confirmed / Stale After 규칙:**
+- `last_confirmed`는 페이지 본문이 여전히 유효함을 사용자가 재확인한 날짜
+- `stale_after` 미지정 시 기본값 = `last_confirmed + 180일`
+- 90일 경과 → `aging` 태그 자동 부여 (Relevance Scoring 시 -1)
+- 180일 경과 → `stale` 태그 자동 부여 (Relevance Scoring 시 -3, 페이지 상단 경고)
+
+**Supersession 규칙:**
+- 새 페이지 생성으로 옛 페이지가 노후화될 때 옛 페이지를 삭제하지 않고 `superseded_by` 필드 추가
+- 새 페이지의 `supersedes`에는 옛 페이지 위키링크 기록
+- 산출물(outputs/)에서 `[[옛페이지]]` 참조 시 LLM이 자동으로 신버전 권장
+- 온톨로지 관계: `[[A]] [supersedes] [[B]]`
 
 ### 태그 프리픽스 규칙
 
@@ -103,17 +141,17 @@ updated: YYYY-MM-DD
 
 | 접두사 | 용도 | 예시 |
 |--------|------|------|
-| `prod/` | 제품/도구 | `prod/my-product`, `prod/my-tool` |
-| `customer/` | 고객사/조직 | `customer/acme-corp` |
-| `type/` | 문서 유형 | `type/summary`, `type/demo`, `type/lab`, `type/webinar`, `type/rca` |
-| `topic/` | 주제·기술 영역 | `topic/zero-trust`, `topic/performance` |
-| `series/` | 시리즈·프로그램 | `series/training-101` |
+| `prod/` | Microsoft 보안 제품 | `prod/mde`, `prod/sentinel`, `prod/entra`, `prod/purview-dlp` |
+| `customer/` | 고객사 | `customer/현대자동차`, `customer/크래프톤` |
+| `type/` | 문서 유형 | `type/summary`, `type/demo`, `type/ninja`, `type/school`, `type/mslearn`, `type/webinar`, `type/lab`, `type/rca` |
+| `topic/` | 주제·기술 영역 | `topic/zero-trust`, `topic/identity`, `topic/cloud-security`, `topic/kql` |
+| `series/` | 시리즈·프로그램 | `series/zt-pillars`, `series/ninja-training`, `series/security-school` |
 
 **태그 규칙:**
 - 한 페이지에 최소 2개, 최대 8개 태그 권장
 - `prod/` 태그는 해당 제품 엔티티 페이지명과 일치시킨다
 - `customer/` 태그는 고객사 엔티티 페이지명과 일치시킨다
-- 중복 없이 가장 구체적인 태그를 사용한다
+- 중복 없이 가장 구체적인 태그를 사용한다 (예: `prod/mde`만 사용, `prod/microsoft` 불필요)
 
 ### 위키링크
 - Obsidian 위키링크 사용: `[[페이지명]]`
@@ -139,15 +177,17 @@ updated: YYYY-MM-DD
 
 새 소스가 `raw/`에 추가되면:
 
+0. **PII 사전 점검** — `scripts/sanitize-ingest.py <파일>` 으로 이메일·IP·토큰·GUID 검사. 발견 시 사용자에게 알리고 마스킹 또는 제외 결정.
 1. 소스를 읽고 핵심 내용을 파악한다
-2. **트리플렛 추출** — 소스에서 `(주체, 관계, 객체)` 형식의 엔티티-관계 트리플렛을 먼저 구조화하여 추출한다 (아래 트리플렛 추출 프로토콜 참조)
-3. `wiki/summaries/`에 요약 페이지를 생성한다 (태그 프리픽스 포함)
-4. 추출된 트리플렛을 기반으로 관련 엔티티 페이지를 `wiki/entities/`에서 업데이트하거나 생성한다
-5. 추출된 트리플렛을 기반으로 관련 개념 페이지를 `wiki/concepts/`에서 업데이트하거나 생성한다
+2. **트리플릿 추출** — 소스에서 `(주체, 관계, 객체)` 형식의 엔티티-관계 트리플릿을 먼저 구조화하여 추출한다 (아래 트리플릿 추출 프로토콜 참조)
+3. `wiki/summaries/`에 요약 페이지를 생성한다 (태그 프리픽스 포함, `confidence` 필드 포함)
+4. 추출된 트리플릿을 기반으로 관련 엔티티 페이지를 `wiki/entities/`에서 업데이트하거나 생성한다
+5. 추출된 트리플릿을 기반으로 관련 개념 페이지를 `wiki/concepts/`에서 업데이트하거나 생성한다
 6. 기존 위키 페이지의 교차참조를 업데이트한다 (자동 위키링크 규칙 적용)
-7. 트리플렛을 `wiki/ontology/` 파일에 APPEND한다 (수동 관계 추출 단계 생략 가능)
-8. 해당 카테고리의 `_index.md`에 1줄 추가한다 (**Tier 1 인덱싱**)
-9. `log.md`에 작업을 기록한다
+7. 새 소스가 기존 페이지를 대체하는 경우 `superseded_by`/`supersedes` 프론트매터를 기록한다
+8. 트리플릿을 `wiki/ontology/` 파일에 APPEND한다 (수동 관계 추출 단계 생략 가능)
+9. 해당 카테고리의 `_index.md`에 1줄 추가한다 (**Tier 1 인덱싱**)
+10. `log.md`에 작업을 기록한다
 
 #### 트리플렛 추출 프로토콜 (LightRAG 차용)
 
@@ -162,7 +202,7 @@ ENTITIES:
 
 RELATIONS:
 - source: "엔티티A"
-  relation: 관계코드   # uses, integrates-with, deployed-at, competes-with, related-to, part-of, depends-on 등
+  relation: 관계코드   # uses, integrates-with, deployed-at, competes-with, related-to, part-of, depends-on, supersedes, superseded-by 등
   target: "엔티티B"
   evidence: "소스의 근거 문장(요약)"
 ```
@@ -208,7 +248,9 @@ RELATIONS:
 | **제목 일치** | +3 | 질의 키워드가 페이지 `title`에 포함 |
 | **태그 일치** | +2 | 질의 의도와 일치하는 `prod/`, `topic/`, `customer/` 태그 보유 |
 | **타입 일치** | +2 | 질의가 "비교"면 `comparison`, "개념"이면 `concept` 등 type 일치 |
+| **신뢰도** | +2 | `confidence ≥ 0.85` (1차 소스 + 검증) / +1 (`≥ 0.65`) |
 | **최신성** | +1 | `updated`가 최근 90일 이내 |
+| **노후 페널티** | −1 / −3 | `aging` 태그 / `stale` 태그 또는 `superseded_by` 존재 |
 | **소스 풍부도** | +1 | `sources` 필드에 3개 이상 |
 | **온톨로지 중심성** | +2 | `wiki/ontology/`에서 인바운드 관계 5개 이상 (허브 페이지) |
 | **백링크 풍부도** | +1 | 다른 페이지에서 `[[페이지명]]` 참조 3회 이상 |
@@ -218,13 +260,14 @@ RELATIONS:
 - 후보 6–15개 → 상위 5개만 본문 읽음
 - 후보 16개 이상 → 상위 7개 + 클러스터 대표 1–2개
 - 점수 동률은 `updated`가 최신인 페이지 우선
+- `superseded_by` 보유 페이지는 스코어 무관 후순위, 답변에 신버전 페이지 권장
 - 답변 마지막에 "검토한 페이지: N개 / 후보 M개" 표기 (투명성)
 
 **예시:**
 ```
-질의: "고객사 X의 Zero Trust 도입 사례"
-→ Route B (tag): customer/X + topic/zero-trust 매칭 12개
-→ Scoring: 상위 5개 선별 (고객사 메인 페이지 +9, ZT pillar 페이지 +7, ...)
+질의: "현대자동차 Zero Trust 도입 사례"
+→ Route B (tag): customer/현대자동차 + topic/zero-trust 매칭 12개
+→ Scoring: 상위 5개 선별 (현대자동차 메인 페이지 +9, ZT pillar 페이지 +7, ...)
 → 본문 5개만 읽고 합성
 ```
 
@@ -233,14 +276,16 @@ RELATIONS:
 주기적으로:
 
 1. 페이지 간 모순을 검사한다
-2. 새 소스에 의해 대체된 오래된 주장을 식별한다
+2. 새 소스에 의해 대체된 오래된 주장을 식별한다 — `superseded_by` 필드로 명시적 대체 처리
 3. 인바운드 링크가 없는 고아 페이지를 발견한다
 4. 언급되었지만 페이지가 없는 개념을 식별한다
 5. 누락된 교차참조를 추가한다
 6. 데이터 갭에 대해 추가 소스를 제안한다
-7. `wiki/ontology/` 파일을 기반으로 클러스터-갭 분석을 수행한다
-8. `wiki/ontology/gap-analysis.md`를 업데이트한다
-9. `log.md`에 점검 결과를 기록한다
+7. **노후 페이지 점검** — `scripts/check-confidence-decay.py` 실행하여 `aging`/`stale` 태그 자동 부여
+8. **PII 사전 점검** — Ingest 전 `scripts/sanitize-ingest.py`로 raw/ 신규 파일 검사
+9. `wiki/ontology/` 파일을 기반으로 클러스터-갭 분석을 수행한다
+10. `wiki/ontology/gap-analysis.md`를 업데이트한다
+11. `log.md`에 점검 결과를 기록한다
 
 ### 4. Ontology Update (온톨로지 갱신)
 
@@ -256,26 +301,9 @@ RELATIONS:
 
 ---
 
-## 온톨로지 관계코드
-
-| 코드 | 의미 | 예시 |
-|------|------|------|
-| `[contains]` | 포함/구성 | `[[Platform]] [contains] [[Product]]` |
-| `[implements]` | 구현/활용 | `[[Framework]] [implements] [[Tool]]` |
-| `[depends-on]` | 의존 | `[[ProductA]] [depends-on] [[ProductB]]` |
-| `[deploys]` | 배포/사용 | `[[Customer]] [deploys] [[Product]]` |
-| `[supports]` | 지원/호환 | `[[Tool]] [supports] [[Platform]]` |
-| `[related-to]` | 관련 | `[[ConceptA]] [related-to] [[ConceptB]]` |
-| `[extends]` | 확장/심화 | `[[Basic]] [extends] [[Advanced]]` |
-| `[solves]` | 문제 해결 | `[[Guide]] [solves] [[Issue]]` |
-| `[teaches]` | 교육/학습 | `[[Course]] [teaches] [[Topic]]` |
-| `[competes-with]` | 경쟁 | `[[ProductA]] [competes-with] [[ProductB]]` |
-
----
-
 ## 로그 형식
 
-`log.md`의 각 항목:
+`log.md`의 각 항목은 다음 형식을 따른다:
 
 ```markdown
 ## [YYYY-MM-DD] 작업유형 | 제목
@@ -341,41 +369,76 @@ count: N
 
 ## 출력 형식
 
+질의 응답 및 위키 페이지는 마크다운이 기본이지만, 필요에 따라 다양한 형식을 사용할 수 있다:
+
 - **마크다운 페이지**: 기본 출력 형식 (wiki/ 내 모든 페이지)
 - **비교 테이블**: 제품/개념 비교 시 테이블 형식 활용
-- **Marp 슬라이드**: 프레젠테이션이 필요할 때 Marp 형식으로 생성
-- **차트/다이어그램**: Mermaid 다이어그램 또는 matplotlib 코드 블록
+- **Marp 슬라이드**: 프레젠테이션이 필요할 때 Marp 형식 마크다운 생성 (Obsidian Marp 플러그인 활용)
+- **PPTX 프레젠테이션**: `python-pptx` 또는 `pptxgenjs`로 네이티브 PowerPoint 생성 (`outputs/presentations/`)
+- **DOCX 보고서**: `docx-js`로 Word 문서 생성 (`outputs/reports/`)
+- **XLSX 분석**: `openpyxl`/`pandas`로 스프레드시트 생성·분석
+- **차트/다이어그램**: Mermaid 다이어그램 또는 matplotlib 코드 블록으로 시각화
 - **Canvas**: Obsidian Canvas 형식으로 개념 맵 생성 가능
 
 ---
 
 ## 바이너리 소스 추출
 
+raw/ 폴더의 바이너리 파일(PDF, PPTX, DOCX, XLSX)을 마크다운으로 변환하는 통합 스크립트.
+**markitdown**(microsoft/markitdown, 102k⭐)을 1차 엔진으로, pymupdf/python-pptx 등을 폴백으로 사용한다.
+
 ### 환경 설정
 
 ```bash
-python3 -m venv .venv
+# Python 3.12 venv (markitdown은 Python 3.10+ 필요)
+.venv/bin/python -c "import markitdown; print('OK')"
+
+# venv가 없으면 생성
+python3.12 -m venv .venv
 .venv/bin/pip install 'markitdown[pdf,pptx,docx,xlsx]'
 ```
 
 ### 사용법
 
 ```bash
+# markitdown 엔진 사용 (권장)
 .venv/bin/python scripts/extract-raw-sources.py <소스폴더> <출력폴더> [--type pdf|pptx|docx|xlsx|all]
+
+# 예시: onsite-reports의 PPTX 전부 추출
+.venv/bin/python scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted/onsite-reports --type pptx
+
+# 예시: microsoft-documents 전체 추출
+.venv/bin/python scripts/extract-raw-sources.py raw/security-microsoft-documents raw/extracted/microsoft-documents --type all
+
+# dry-run으로 대상만 확인
+.venv/bin/python scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted/onsite-reports --dry-run
+
+# 폴백 전용 (markitdown 없는 환경)
+python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted/onsite-reports --no-markitdown
 ```
+
+### 추출 라이브러리
+
+| 엔진 | 라이브러리 | 용도 | 비고 |
+|------|-----------|------|------|
+| **1차** | `markitdown` (microsoft/markitdown) | PDF, PPTX, DOCX, XLSX + HTML/CSV/JSON/XML/이미지/오디오/ZIP | Python 3.10+, `.venv` 필요 |
+| 폴백 | `pymupdf (fitz)` | PDF 텍스트 추출 | OCR 없이도 대부분 처리 |
+| 폴백 | `python-pptx` | PPTX 슬라이드별 텍스트 + 발표자 노트 | |
+| 폴백 | `zipfile + xml` | DOCX 문단별 텍스트 | 의존성 최소화 |
+| 폴백 | `openpyxl` | XLSX 시트별 마크다운 테이블 | |
 
 ### 추출 규칙
 - 원본(raw/)은 절대 수정하지 않는다 (불변)
 - 추출 결과는 `raw/extracted/` 하위에 원본 폴더 구조를 유지하며 .md로 저장한다
+- `--force` 없으면 기존 추출 파일은 건너뛴다
+- 추출된 마크다운은 인제스트 파이프라인의 입력으로 사용한다
 
----
+### Knowledge Capture 패턴 (Notion 스킬 참조)
 
-## Knowledge Capture 패턴
-
-대화나 미팅 노트에서 지식을 캡처할 때:
+대화나 미팅 노트에서 지식을 캡처할 때의 워크플로우:
 
 1. **분류**: 캡처 유형 결정 (결정사항, How-to, FAQ, 개념, 학습 노트, 문서)
-2. **위치**: wiki/ 하위 적절한 카테고리 선택
+2. **위치**: wiki/ 하위 적절한 카테고리 선택 (entities/concepts/summaries/synthesis)
 3. **추출**: 핵심 사실, 결정, 행동 항목, 근거를 구조화
 4. **생성**: YAML 프론트매터 + 위키링크 포함하여 페이지 생성
 5. **연결**: 관련 페이지에 교차참조 추가, index.md 업데이트
@@ -384,39 +447,40 @@ python3 -m venv .venv
 
 ## 스케일 & 도구
 
+### 현재 규모 (2026-04-18)
+- raw/ 전체: 5,747 인덱싱 파일 (workspace 직속 ~703MB) + 외부 심볼릭 링크 5종 (obsidian / fy26-readiness / readiness-archives / security-onsite-reports / security-microsoft-documents)
+- wiki/ 페이지: **216** (entities 55 / concepts 31 / summaries 108 / comparisons 1 / synthesis 15 / ontology 6)
+- 위키링크: 3,259개 (페이지당 평균 15.1)
+- Microsoft Security 제품 커버리지: **27/27 (100%)** — MSEM 추가로 완료 (2026-04-14)
+- 태그: 486종 (prod/ 31 · customer/ 9 · topic/ 422 · type/ 18 · series/ 6)
+- 2-tier 인덱스: `index.md` (허브) + 카테고리별 `_index.md` 5개
+- Git 커밋: 46개 / 작업 로그 항목: 70개
+- index.md 허브 → 카테고리 _index.md → wiki/ontology/ 기반 구조 분석을 병행한다
+
 ### 스케일 전환 기준
-- 위키 페이지 ~100개까지: 2-tier 인덱스 + wiki/ontology/ 기반 탐색으로 충분
-- 위키 페이지 **500+** 이상: 로컬 마크다운 검색 엔진(qmd 등) 도입 권장
+- 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
+- 이 시점에서 **qmd**(로컬 마크다운 검색 엔진, BM25+벡터 하이브리드)를 CLI/MCP 도구로 도입한다
+- 참고: [[qmd]] 엔티티 페이지
 
-### Lint 유틸리티 스크립트
+### Obsidian 도구
+- **Web Clipper**: 브라우저 기사 → 마크다운 변환 (`raw/assets/Obsidian/Clippings/`로 수집)
+- **Graph View**: 위키 구조 시각화, 허브/고아 페이지 식별 (Lint 시 활용)
+- **Dataview 플러그인**: YAML 프론트매터 기반 동적 테이블/리스트 생성
+- **이미지 로컬 다운로드**: 설정 → Files and links → Attachment folder path를 `raw/assets/`로 지정
 
-프로젝트 루트에서 실행:
+### 버전 관리
+- 위키는 마크다운 파일의 git 레포지토리로 운영할 수 있다
+- 버전 히스토리, 브랜칭, 롤백을 무료로 확보한다
 
-```bash
-python scripts/wiki-stats.py          # 위키 통계 (페이지/태그/링크 현황)
-python scripts/find-orphans.py         # 고아 페이지 탐지 (0 인바운드 링크)
-python scripts/check-tags.py           # 태그 프리픽스 준수 검사
-python scripts/scan-broken-links.py    # 깨진 위키링크 스캔
-python scripts/check-ontology.py       # 온톨로지 정합성 검사
-```
-
-LLM Lint 워크플로우와 병행하여 사용하면 정합성을 더 정밀하게 유지할 수 있다.
-
-### 추천 도구
-- **Obsidian**: 마크다운 에디터 + Graph View + 위키링크 네비게이션
-  - Web Clipper: 브라우저 기사 → 마크다운 변환
-  - Dataview: YAML 프론트매터 기반 동적 테이블
-  - Marp Slides: 프레젠테이션 생성
-- **Git**: 버전 히스토리, 브랜칭, 롤백
-
----
-
-## 커스터마이징 가이드
-
-이 스키마를 자신의 도메인에 맞게 수정하려면:
-
-1. `{{PROJECT_ROOT}}`를 실제 경로로 변경
-2. `{{YOUR_NAME}}`을 자신의 이름으로 변경
-3. raw/ 하위 구조를 자신의 소스 유형에 맞게 조정
-4. 관계코드에 도메인 고유 코드를 추가 (예: 의학 위키라면 `[treats]`, `[diagnoses]`)
-5. 페이지 타입에 도메인 고유 타입 추가 (예: `question`, `timeline`, `data`)
+### Owen-WIKI 템플릿 킷 (`Owen-WIKI/`)
+- 이 WIKI 저장소의 구조·규칙·워크플로우를 패키징한 **재사용 가능한 템플릿 킷**
+- 다른 사용자가 동일한 수준의 LLM Wiki를 구축할 수 있도록 AGENTS.md, 스타터 파일, 페이지 템플릿, 온톨로지 템플릿, 바이너리 추출 스크립트를 포함한다
+- **버전업 규칙**: WIKI의 다음 항목이 변경되면 Owen-WIKI 킷도 함께 업데이트한다:
+  1. AGENTS.md의 워크플로우가 변경될 때
+  2. 새로운 레이어/폴더가 추가될 때
+  3. 온톨로지 관계코드가 확장될 때
+  4. 페이지 타입이 추가될 때
+  5. 스크립트가 업데이트될 때
+- 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
+- 현재 버전: **v1.4.0** (2026-04-21) — Confidence/Provenance 필드 + Supersession 메커니즘 + PII 사전 점검 도입
+- **이중 경로 동기화**: 템플릿 변경 시 워크스페이스 `outputs/Owen-WIKI/`와 외부 `/Users/owen/work/owen-wiki/` 양쪽 모두 갱신한다

@@ -5,23 +5,25 @@ tags: []
 sources: []
 created: {{date}}
 updated: {{date}}
+confidence: 0.7
+last_confirmed: {{date}}
+stale_after: ""
+supersedes: []
+superseded_by: ""
 ---
 
 # {{title}}
 
 ## 비교 대상
 
-- **A**: _대상 A 설명_
-- **B**: _대상 B 설명_
+- A: 
+- B: 
 
 ## 비교 표
 
 | 항목 | A | B |
 |------|---|---|
-| 목적 | | |
-| 장점 | | |
-| 단점 | | |
-| 적합한 경우 | | |
+|      |   |   |
 
 ## 분석
 
