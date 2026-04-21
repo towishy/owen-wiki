@@ -46,7 +46,7 @@ cp <path-to>/Owen-WIKI/AGENTS.md ./AGENTS.md
 cp <path-to>/Owen-WIKI/starter-files/* ./
 cp <path-to>/Owen-WIKI/templates/* ./templates/
 cp <path-to>/Owen-WIKI/ontology-templates/* ./wiki/ontology/
-cp <path-to>/Owen-WIKI/scripts/* ./scripts/
+cp <path-to>/Owen-WIKI/scripts/* ./scripts/   # v1.4.0에서 스크립트 8종 포함
 
 # 4. AGENTS.md를 열어 도메인/경로를 자신의 것으로 수정
 
@@ -54,6 +54,7 @@ cp <path-to>/Owen-WIKI/scripts/* ./scripts/
 git init && echo ".venv/\nraw/extracted/" > .gitignore
 
 # 6. 첫 소스를 raw/에 넣고 LLM에게 "ingest 해줘" 지시
+#    → sanitize-ingest.py가 자동으로 PII 점검 후 진행
 ```
 
 상세 가이드: `SETUP-GUIDE.md`
@@ -95,9 +96,9 @@ git init && echo ".venv/\nraw/extracted/" > .gitignore
 
 | 워크플로우 | 트리거 | 핵심 동작 |
 |------------|--------|-----------|
-| **Ingest** | 새 소스 추가 | 트리플렛 추출 (LightRAG) → 요약 생성 → 엔티티/개념 업데이트 → 온톨로지 APPEND |
-| **Query** | 질문 | 5-Route 탐색 → Relevance Scoring (LightRAG) → 합성 답변 |
-| **Lint** | 주기적 | 모순/고아/갭 검사 → gap-analysis.md 갱신 |
+| **Ingest** (10단계) | 새 소스 추가 | **PII 점검(v1.4)** → 트리플릿 추출 (LightRAG) → 요약 생성 → 엔티티/개념 업데이트 → 온톨로지 APPEND |
+| **Query** | 질문 | 5-Route 탐색 → Relevance Scoring 9기준 (신뢰도+노후 포함) → 합성 답변 |
+| **Lint** (11단계) | 주기적 | 모순/고아/갭 검사 + **노후 점검(v1.4)** → gap-analysis.md 갱신 |
 | **Ontology Update** | 대규모 변경 후 | 클러스터-갭 재분석 → overview.md 갱신 |
 
 > **v1.3.0 신규 프로토콜** — Ingest 시 `(주체, 관계, 객체)` 트리플렛을 ENTITIES/RELATIONS YAML 형식으로 먼저 추출 → 온톨로지 자동 APPEND. Query 시 후보 페이지 6개 이상이면 메타데이터 기반 7개 기준(제목/태그/타입/최신성/소스/중심성/백링크) 점수화로 토큰 절감.
