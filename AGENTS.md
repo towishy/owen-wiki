@@ -386,6 +386,50 @@ count: N
 
 ---
 
+## 다이어그램 표준 (Mermaid 우선)
+
+모든 도식·인포그래픽은 **Mermaid**를 우선 사용한다. ASCII 박스 다이어그램은 금지 (Obsidian 네이티브 지원, 한글 전각/반각 정렬 문제 없음).
+
+### A3 PDF 가로폭 제한
+
+- 가로 다이어그램(`flowchart LR`)은 노드 6개 이하로 제한
+- 노드가 많으면 `flowchart TB` 세로 방향 또는 wrap (subgraph 상하 적층)
+- Gantt는 일자 단위(7~14일)로 짧게 구성
+- 노드 텍스트도 짧게 (`<br/>` 줄바꿈 활용)
+- edge label에 `<br/>` 사용 금지 → `"..."` 따옴표로 감싸고 공백으로 구분
+
+### 표준 4색 팔레트 (일반 흐름도)
+
+| 구분 | Fill | Stroke | Text | 용도 |
+|------|------|--------|------|------|
+| **General** | `#F9FAFB` | `#D1D5DB` | `#1F2937` | 시작/일반 노드 |
+| **Highlight** | `#E0F2FE` | `#0EA5E9` | `#075985` | 핵심·강조 |
+| **Decision** | `#FFFFFF` | `#6B7280` | `#374151` | 판단 (마름모) |
+| **Success** | `#FFFFFF` | `#10B981` | `#065F46` | 최종/완료 |
+
+적용 예시:
+```
+style MyNode fill:#E0F2FE,stroke:#0EA5E9,color:#075985
+```
+
+### 제품별 식별 색상 (필요 시만)
+
+Microsoft 제품을 시각적으로 구분해야 하는 다이어그램에만 제한적으로 사용:
+
+| 제품 | Fill | Stroke |
+|------|------|--------|
+| Entra ID P2 | `#efe7ff` | `#bc8cff` |
+| MDI | `#fff5d1` | `#d29922` |
+| MDE | `#ffe1de` | `#f85149` |
+| Intune | `#ffe1f0` | `#f778ba` |
+| Purview DLP | `#e1f5e1` | `#3fb950` |
+| GSA | `#e1eeff` | `#58a6ff` |
+| Conditional Access | `#d1f0ee` | `#39d2c0` |
+
+텍스트 색은 `color:#1a1a1a` (A3 인쇄 친화).
+
+---
+
 ## 바이너리 소스 추출
 
 raw/ 폴더의 바이너리 파일(PDF, PPTX, DOCX, XLSX)을 마크다운으로 변환하는 통합 스크립트.
@@ -520,5 +564,5 @@ python scripts/wiki-graph-viz.py [--wiki-dir wiki] [--out-dir graphify-out]
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.5.0** (2026-04-23) — 위키 그래프 시각화 스크립트 + graphify-out 레이어 도입
+- 현재 버전: **v1.6.0** (2026-04-23) — 다이어그램 표준 (Mermaid 우선 + 4색 팔레트) 추가
 - **이중 경로 동기화**: 템플릿 변경 시 워크스페이스 `outputs/Owen-WIKI/`와 외부 `/Users/owen/work/owen-wiki/` 양쪽 모두 갱신한다
