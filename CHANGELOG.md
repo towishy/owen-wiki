@@ -5,6 +5,33 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.5.0] — 2026-04-23
+
+### 위키 그래프 시각화 스크립트 + graphify-out 레이어
+
+위키 전체 [[위키링크]] 그래프를 자동 시각화하는 스크립트 도입. Louvain 커뮤니티 탐지, God Node/Betweenness Centrality 분석, 인터랙티브 HTML 시각화를 제공.
+
+**변경사항:**
+- `scripts/wiki-graph-viz.py` (신규): wiki/ 폴더의 모든 .md에서 [[위키링크]] 파싱 → NetworkX 방향 그래프 구축 → Louvain 커뮤니티 탐지 → pyvis 인터랙티브 HTML + GRAPH_REPORT.md + graph.json 생성
+- `AGENTS.md` · 볼트 구조: `graphify-out/` 폴더 추가 (graph.html, GRAPH_REPORT.md, graph.json)
+- `AGENTS.md` · 스케일 & 도구: **그래프 시각화** 섹션 신설 — 의존성, 사용법, 출력 파일, 분석 항목 표, 실행 주기 안내
+- 의존성: `networkx`, `pyvis`, `python-louvain` (pip install)
+
+**분석 항목:**
+- God Nodes (Degree Top 20): 위키 핵심 허브 페이지 파악
+- Betweenness Centrality (Top 10): 구조적 병목 노드 식별
+- Louvain 커뮤니티: 자동 의미 클러스터링 (카테고리와 비교 가능)
+- 고아 노드 / 인바운드 0 페이지: Lint 시 보강 대상
+- 커뮤니티 간 엣지: 예상 외 관계 발견 (Surprise Edge)
+
+**도입 이유:**
+- Obsidian Graph View는 시각적이지만 정량 분석(중심성, 커뮤니티) 불가
+- 온톨로지 파일(.md) 기반 수동 관계 관리의 한계 → 위키링크에서 자동 그래프 생성
+- 500+ 페이지 스케일 전환 전 구조 분석 기반 마련
+- Graphify(graphify.net) 개념을 도메인 지식 위키에 맞게 경량 구현
+
+---
+
 ## [1.4.0] — 2026-04-21
 
 ### Confidence/Provenance 필드 + Supersession + PII 사전 점검

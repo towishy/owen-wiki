@@ -46,6 +46,10 @@
 │   ├── reports/           ← 고객 보고서, 분기 리포트
 │   ├── workshops/         ← 워크숍, VBD 자료
 │   └── drafts/            ← 작성 중인 산출물
+├── graphify-out/          ← 위키 그래프 시각화 출력 (scripts/wiki-graph-viz.py)
+│   ├── graph.html         ← 인터랙티브 시각화 (브라우저)
+│   ├── GRAPH_REPORT.md    ← God nodes, 커뮤니티, 고아 노드 분석
+│   └── graph.json         ← 쿼리용 그래프 JSON
 ├── Owen-WIKI/             ← 재사용 가능한 LLM Wiki 템플릿 킷
 ├── scripts/               ← 유틸리티 스크립트 (Python/PowerShell)
 └── templates/             ← 페이지 템플릿
@@ -462,6 +466,40 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 - 이 시점에서 **qmd**(로컬 마크다운 검색 엔진, BM25+벡터 하이브리드)를 CLI/MCP 도구로 도입한다
 - 참고: [[qmd]] 엔티티 페이지
 
+### 그래프 시각화 (`scripts/wiki-graph-viz.py`)
+
+wiki/ 폴더의 모든 `[[위키링크]]`를 파싱하여 NetworkX 방향 그래프를 구축하고, Louvain 커뮤니티 탐지 후 인터랙티브 HTML + 분석 보고서를 생성한다.
+
+**의존성:**
+```bash
+pip install networkx pyvis python-louvain
+```
+
+**사용법:**
+```bash
+python scripts/wiki-graph-viz.py [--wiki-dir wiki] [--out-dir graphify-out]
+```
+
+**출력:**
+- `graphify-out/graph.html` — 인터랙티브 시각화 (ForceAtlas2 레이아웃, 노드 크기=연결수, 색상=커뮤니티)
+- `graphify-out/GRAPH_REPORT.md` — God Nodes(Top 20), Betweenness Centrality(Top 10), 커뮤니티 상세, 고아 노드, 인바운드 0 페이지
+- `graphify-out/graph.json` — 프로그래밍 방식 쿼리용 (NetworkX node-link JSON)
+
+**분석 항목:**
+
+| 분석 | 설명 | 활용 |
+|------|------|------|
+| God Nodes | Degree 상위 노드 (허브 페이지) | 위키 핵심축 파악 |
+| Betweenness Centrality | 브릿지 역할 노드 | 구조적 병목 식별 |
+| Louvain 커뮤니티 | 자동 의미 클러스터링 | 카테고리 vs 실제 관계 비교 |
+| 고아 노드 | 연결 없는 노드 | Lint 시 삭제/연결 대상 |
+| 인바운드 0 | 아무도 링크하지 않는 위키 페이지 | 교차참조 보강 대상 |
+| 커뮤니티 간 엣지 | 클러스터 횡단 연결 | 예상 외 관계 발견 |
+
+**실행 주기:**
+- 대규모 변경(10+ 페이지) 후, Lint 시, 또는 온톨로지 갱신 시 실행
+- `graphify-out/`은 `.gitignore`에 추가 가능 (생성물이므로)
+
 ### Obsidian 도구
 - **Web Clipper**: 브라우저 기사 → 마크다운 변환 (`raw/assets/Obsidian/Clippings/`로 수집)
 - **Graph View**: 위키 구조 시각화, 허브/고아 페이지 식별 (Lint 시 활용)
@@ -482,5 +520,5 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.4.0** (2026-04-21) — Confidence/Provenance 필드 + Supersession 메커니즘 + PII 사전 점검 도입
+- 현재 버전: **v1.5.0** (2026-04-23) — 위키 그래프 시각화 스크립트 + graphify-out 레이어 도입
 - **이중 경로 동기화**: 템플릿 변경 시 워크스페이스 `outputs/Owen-WIKI/`와 외부 `/Users/owen/work/owen-wiki/` 양쪽 모두 갱신한다

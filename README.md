@@ -3,7 +3,7 @@
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.4.0 (2026-04-18)
+**Version**: 1.5.0 (2026-04-23)
 
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 216+ 페이지 운영 경험 기반
 
