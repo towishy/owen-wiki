@@ -5,6 +5,43 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.7.0] — 2026-04-24
+
+### 자동 클러스터 허브 정책 + 100% raw→wiki 변환 + 스크립트 10종 추가
+
+대규모 raw/ 자료(고객사별 동일 워크숍 사본 등)를 개별 ingest 하지 않고 **클러스터 허브 페이지로 일괄 sources 등록**하는 운영 정책을 정식 채택. 운영 결과 **raw → wiki 변환율 100% (5,798/5,798)**, **깨진 링크 0**, **고아 페이지 0** 달성.
+
+**AGENTS.md 변경:**
+- `### 자동 클러스터 허브 정책 (v1.7+)` 신규 섹션 (스케일 & 도구 하위)
+  - 임계값: 3개 이상 파일이 동일 클러스터 키 공유 시 허브 자동 생성
+  - confidence 기본값: 자동 허브 0.55 / 큐레이션 허브 0.65 / 1차 소스 summary 0.85+
+  - SKIP_PREFIX/SKIP_CONTAINS 패턴, NFC normalize + 특수문자 매칭 규칙
+- `### 현재 규모` 갱신 (페이지 339, 위키링크 4,428, 변환율 100%, 그래프 통계 추가)
+- `## 스케일 & 도구` 단순화 — 그래프 시각화 상세 섹션은 v1.5.0과 중복이라 본문에서 제거 (스크립트는 유지)
+
+**스크립트 추가 (10종):**
+
+| 파일 | 용도 |
+|------|------|
+| `auto-cluster-hubs.py` | 미수집 raw 후보 스캔 → 2단계 경로 그룹핑 → 허브 summary 자동 생성 |
+| `absorb-remaining-uningested.py` | 잔여 미수집 파일을 라우팅 룰로 기존 허브에 흡수 |
+| `find-uningested-raw.py` | raw/ 미참조 파일 스캔 (NFC normalize + 괄호·대괄호·작은따옴표 지원) |
+| `fix-broken-wikilinks.py` | ALIASES dict 기반 깨진 위키링크 자동 교정 + 이미지 마크다운 변환 |
+| `apply-default-confidence.py` | 정책 기반 confidence/last_confirmed 일괄 부여 |
+| `auto-extract-triplets.py` | LLM 기반 ENTITIES/RELATIONS 트리플렛 추출 스켈레톤 (LightRAG 형식) |
+| `fix-hub-sources.py` | 손상된 클러스터 허브 sources YAML 복구 (mojibake/backslash → UTF-8) |
+| `append-ontology.py` | 트리플렛 YAML을 *-ontology.md에 dedupe 후 APPEND |
+| `rebalance-confidence.py` | type/mslearn·type/ninja 등 1차 소스 페이지 confidence 재평가 |
+| `gen-hub-category-index.py` | 허브 sources를 1단계 경로(서브폴더)로 그룹화한 본문 인덱스 생성 |
+
+**도입 이유:**
+
+- 4,000+ 파일 규모 raw/(고객사 워크숍·MS 보안 교육 자료 등)를 1:1 summary로 처리 시 토큰·시간 폭증
+- 허브 + sources 등록만으로도 LLM 검색·요약·산출 가능 → "흡수" 경제성 확보
+- 운영 검증: 변환율 60% → 100% 달성, 동시에 깨진 링크 11→0
+
+---
+
 ## [1.6.0] — 2026-04-23
 
 ### 다이어그램 표준 섹션 신설 (Mermaid 우선 + 4색 팔레트)
