@@ -1,0 +1,49 @@
+name: Wiki Lint
+
+on:
+  pull_request:
+    paths:
+      - 'wiki/**'
+      - 'AGENTS.md'
+      - 'scripts/**'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Find orphan pages
+        run: python scripts/find-orphans.py
+        continue-on-error: true
+
+      - name: Scan broken wikilinks
+        run: python scripts/scan-broken-links.py
+
+      - name: Check ontology consistency
+        run: python scripts/check-ontology.py
+        continue-on-error: true
+
+      - name: Check tag drift
+        run: python scripts/check-tags.py
+        continue-on-error: true
+
+      - name: Identify stub pages
+        run: python scripts/identify-stubs.py
+
+      - name: Check confidence decay
+        run: python scripts/check-confidence-decay.py
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wiki-lint-reports
+          path: outputs/drafts/
+          if-no-files-found: ignore

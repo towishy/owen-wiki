@@ -5,6 +5,51 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.8.0] — 2026-04-24
+
+### 저장소 최적화 도구 세트 (분석·자동화 스크립트 8종)
+
+위키 규모가 커질수록 필요한 **건강 점검·분석·자동화** 도구를 정식 패키지화. 본 v1.8.0은 코드 변경만 수반하며 AGENTS.md 워크플로 자체는 v1.7.0과 호환.
+
+**AGENTS.md 변경:**
+- `### 저장소 최적화 도구 (v1.8+)` 신규 섹션 추가 (스케일 & 도구 하위)
+  - 스크립트 8종 + 강화된 check-ontology.py + tag-aliases.yml + GitHub Actions CI
+  - 권장 운영 주기 (PR마다 / 주간 / 월간 / 상시)
+
+**스크립트 추가 (8종):**
+
+| 파일 | 용도 |
+|------|------|
+| `analyze-large-hubs.py` | 50KB+ 거대 허브 식별 + sub-hub 분할 계획 (sources 클러스터 키 기반) |
+| `identify-stubs.py` | stub 페이지 자동 식별 (본문<200자, 무소스 등) → 보강 큐 보고서 |
+| `backfill-confidence.py` | confidence/last_confirmed 휴리스틱 백필 (소스 풍부도 + type 기반) |
+| `build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율 측정·고립 raw 식별) |
+| `generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`<!-- AUTO -->` 마커로 안전 갱신) |
+| `compute-pagerank.py` | 그래프 PageRank로 허브 페이지 식별 (NetworkX 의존성 없이 자체 구현) |
+| `weekly-gap-report.py` | 주간 갭 분석 종합 (orphans/broken/stubs/decay/raw-coverage 통합) |
+| `sync-to-obsidian.ps1` | wiki→외부 Obsidian 볼트 증분 동기 (양 OS 호환 pwsh 7+, `-Destination` 또는 `$env:OBSIDIAN_MIRROR`) |
+
+**기존 스크립트 강화:**
+- `check-ontology.py` — supersedes/superseded_by **양방향 일관성 검증** + **31개 표준 관계코드 사전** (uses, integrates-with, deployed-at, ..., teaches, solves)
+
+**신규 설정:**
+- `tag-aliases.yml` — 태그 정규화 매핑 사전 (`정규: [별칭, ...]` 형식, `migrate-tags.py`와 결합 사용)
+- `.github/workflows/wiki-lint.yml` — PR 시 자동 lint 실행 + 보고서 아티팩트 업로드
+
+**도입 이유:**
+- 위키 규모 300+ 페이지에서 거대 허브(>100KB) 출현 → Copilot 컨텍스트 부담·편집 지연 발생
+- confidence/last_confirmed 메타데이터를 v1.4부터 권장했으나 기존 페이지 백필 도구 부재
+- outputs/와 wiki/ 간 단방향 참조만 존재 → wiki 페이지에서 산출물 추적 불가
+- 갭 분석을 매번 수동 실행 → 주간 자동화 필요
+- macOS↔Windows 양 OS 환경에서 Obsidian 동기화 hook 부재
+
+**호환성:**
+- AGENTS.md v1.7.0과 완전 호환 (워크플로 변경 없음, 도구만 추가)
+- Python 3.10+ (휴리스틱·그래프 분석은 표준 라이브러리만 사용, NetworkX 미필수)
+- PowerShell Core 7+ (Win/macOS/Linux 동일 동작)
+
+---
+
 ## [1.7.0] — 2026-04-24
 
 ### 자동 클러스터 허브 정책 + 100% raw→wiki 변환 + 스크립트 10종 추가

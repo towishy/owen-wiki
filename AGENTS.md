@@ -517,6 +517,30 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 - **SKIP 패턴**: 이미 인제스트된 클러스터(`raw/articles/mslearn/`, `raw/obsidian/` 등)는 `SKIP_PREFIX`/`SKIP_CONTAINS`로 제외
 - **scanner 매칭 규칙** (`scripts/find-uningested-raw.py`): NFC normalize + 괄호·대괄호·작은따옴표 포함 파일명 지원 필수
 
+### 저장소 최적화 도구 (v1.8+)
+
+규모가 커진 위키의 건강을 유지하기 위한 분석·자동화 스크립트 세트.
+
+| 스크립트 | 용도 | 출력 |
+|---------|------|------|
+| `scripts/analyze-large-hubs.py` | 50KB+ 거대 허브 식별 + sub-hub 분할 계획 | `outputs/drafts/large-hubs-split-plan.md` |
+| `scripts/identify-stubs.py` | stub 페이지 자동 식별 (본문<200자, 무소스 등) | `outputs/drafts/stub-pages-report.md` |
+| `scripts/backfill-confidence.py` | confidence/last_confirmed 휴리스틱 백필 | YAML 프론트매터 인플레이스 |
+| `scripts/build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율·고립 raw 식별) | `outputs/drafts/raw-to-wiki-map.{json,md}` |
+| `scripts/generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`## 파생 산출물`) | wiki 페이지 인플레이스 |
+| `scripts/compute-pagerank.py` | 그래프 PageRank로 허브 페이지 식별 | `outputs/drafts/wiki-pagerank.md` |
+| `scripts/weekly-gap-report.py` | 주간 갭 분석 종합 (orphans/broken/stubs/decay) | `outputs/drafts/weekly-gaps-YYYY-MM-DD.md` |
+| `scripts/sync-to-obsidian.ps1` | wiki→외부 Obsidian 볼트 증분 동기 (`-Destination` 또는 `$env:OBSIDIAN_MIRROR`) | 파일 복사 |
+| `scripts/check-ontology.py` (강화) | 양방향 supersession 검증 + 31개 표준 관계코드 사전 | stdout |
+| `scripts/tag-aliases.yml` | 태그 정규화 매핑 사전 (정규: [별칭, ...]) | 데이터 |
+| `.github/workflows/wiki-lint.yml` | PR 시 lint 자동 실행 + 보고서 아티팩트 업로드 | GitHub Actions |
+
+**권장 운영 주기:**
+- **PR마다**: GitHub Actions로 자동 (orphans / broken-links / ontology / tags / stubs / decay)
+- **주간**: `weekly-gap-report.py` cron/Task Scheduler 등록 → 갭 우선순위 결정
+- **월간**: `analyze-large-hubs.py` + `compute-pagerank.py`로 구조 점검
+- **상시**: `sync-to-obsidian.ps1`을 wiki/ 변경 hook으로 등록
+
 ### 스케일 전환 기준
 - 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
 - 이 시점에서 **qmd**(로컬 마크다운 검색 엔진, BM25+벡터 하이브리드)를 CLI/MCP 도구로 도입한다
@@ -542,5 +566,5 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.6.0** (2026-04-23) — 다이어그램 표준 (Mermaid 우선 + 4색 팔레트) 추가
+- 현재 버전: **v1.8.0** (2026-04-24) — 저장소 최적화 도구 세트 추가 (분석·자동화 스크립트 8종 + check-ontology 강화 + tag-aliases.yml + GitHub Actions CI)
 - 경로 동기화**: 템플릿 변경 시 외부 `/Users/owen/work/owen-wiki/` 갱신한다
