@@ -495,54 +495,32 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 
 ## 스케일 & 도구
 
-### 현재 규모 (2026-04-18)
-- raw/ 전체: 5,747 인덱싱 파일 (workspace 직속 ~703MB) + 외부 심볼릭 링크 5종 (obsidian / fy26-readiness / readiness-archives / security-onsite-reports / security-microsoft-documents)
-- wiki/ 페이지: **216** (entities 55 / concepts 31 / summaries 108 / comparisons 1 / synthesis 15 / ontology 6)
-- 위키링크: 3,259개 (페이지당 평균 15.1)
-- Microsoft Security 제품 커버리지: **27/27 (100%)** — MSEM 추가로 완료 (2026-04-14)
-- 태그: 486종 (prod/ 31 · customer/ 9 · topic/ 422 · type/ 18 · series/ 6)
-- 2-tier 인덱스: `index.md` (허브) + 카테고리별 `_index.md` 5개
-- Git 커밋: 46개 / 작업 로그 항목: 70개
+### 현재 규모 (2026-04-24)
+- raw/ 전체: 6,789 인덱싱 파일 (workspace 직속 ~1.0GB) + 외부 심볼릭 링크 5종 (obsidian / fy26-readiness / readiness-archives / security-onsite-reports / security-microsoft-documents)
+- wiki/ 페이지: **339** (entities 90 / concepts 54 / summaries 166 / comparisons 7 / synthesis 16 / ontology 6)
+- 위키링크: 4,428개 (페이지당 평균 13.1)
+- **raw → wiki 변환율: 100.0%** (5,798/5,798 인덱싱 파일이 wiki 페이지에서 참조됨)
+- Microsoft Security 제품 커버리지: **27/27 (100%)**
+- 태그: 596종 (prod/ 46 · customer/ 18 · topic/ 486 · type/ 33 · series/ 12)
+- Confidence 분포: 0.95+ 2 / 0.80–0.94 31 / 0.65–0.79 279 / 0.40–0.64 20 / unset 0
+- 2-tier 인덱스: `index.md` (허브) + 카테고리별 `_index.md` 6개 (entities/concepts/summaries/comparisons/synthesis/ontology)
+- Git 커밋: 88개+ / 작업 로그 항목: 73개+
+- 그래프(graphify-out): 노드 390 · 엣지 2,567 · 커뮤니티 20 · 고아 0 · 깨진 링크 0
 - index.md 허브 → 카테고리 _index.md → wiki/ontology/ 기반 구조 분석을 병행한다
+
+### 자동 클러스터 허브 정책 (v1.7+)
+대량 raw/ 자료(고객사별 동일 워크숍 사본 등)는 개별 ingest 대신 **클러스터 허브 페이지**로 일괄 sources 등록한다.
+- **임계값**: 3개 이상 파일이 동일 클러스터 키(2~3 단계 경로) 공유 시 허브 자동 생성
+- **스크립트**: `scripts/auto-cluster-hubs.py` (자동 생성) + `scripts/absorb-remaining-uningested.py` (잔여 라우팅)
+- **confidence**: 자동 허브는 0.55, 큐레이션 허브는 0.65, 1차 소스 summary는 0.85+
+- **본문**: 허브는 sources YAML과 클러스터 설명만 작성, 본문 큐레이션은 가치 평가 후 별도 summary로 승격
+- **SKIP 패턴**: 이미 인제스트된 클러스터(`raw/articles/mslearn/`, `raw/obsidian/` 등)는 `SKIP_PREFIX`/`SKIP_CONTAINS`로 제외
+- **scanner 매칭 규칙** (`scripts/find-uningested-raw.py`): NFC normalize + 괄호·대괄호·작은따옴표 포함 파일명 지원 필수
 
 ### 스케일 전환 기준
 - 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
 - 이 시점에서 **qmd**(로컬 마크다운 검색 엔진, BM25+벡터 하이브리드)를 CLI/MCP 도구로 도입한다
 - 참고: [[qmd]] 엔티티 페이지
-
-### 그래프 시각화 (`scripts/wiki-graph-viz.py`)
-
-wiki/ 폴더의 모든 `[[위키링크]]`를 파싱하여 NetworkX 방향 그래프를 구축하고, Louvain 커뮤니티 탐지 후 인터랙티브 HTML + 분석 보고서를 생성한다.
-
-**의존성:**
-```bash
-pip install networkx pyvis python-louvain
-```
-
-**사용법:**
-```bash
-python scripts/wiki-graph-viz.py [--wiki-dir wiki] [--out-dir graphify-out]
-```
-
-**출력:**
-- `graphify-out/graph.html` — 인터랙티브 시각화 (ForceAtlas2 레이아웃, 노드 크기=연결수, 색상=커뮤니티)
-- `graphify-out/GRAPH_REPORT.md` — God Nodes(Top 20), Betweenness Centrality(Top 10), 커뮤니티 상세, 고아 노드, 인바운드 0 페이지
-- `graphify-out/graph.json` — 프로그래밍 방식 쿼리용 (NetworkX node-link JSON)
-
-**분석 항목:**
-
-| 분석 | 설명 | 활용 |
-|------|------|------|
-| God Nodes | Degree 상위 노드 (허브 페이지) | 위키 핵심축 파악 |
-| Betweenness Centrality | 브릿지 역할 노드 | 구조적 병목 식별 |
-| Louvain 커뮤니티 | 자동 의미 클러스터링 | 카테고리 vs 실제 관계 비교 |
-| 고아 노드 | 연결 없는 노드 | Lint 시 삭제/연결 대상 |
-| 인바운드 0 | 아무도 링크하지 않는 위키 페이지 | 교차참조 보강 대상 |
-| 커뮤니티 간 엣지 | 클러스터 횡단 연결 | 예상 외 관계 발견 |
-
-**실행 주기:**
-- 대규모 변경(10+ 페이지) 후, Lint 시, 또는 온톨로지 갱신 시 실행
-- `graphify-out/`은 `.gitignore`에 추가 가능 (생성물이므로)
 
 ### Obsidian 도구
 - **Web Clipper**: 브라우저 기사 → 마크다운 변환 (`raw/assets/Obsidian/Clippings/`로 수집)
@@ -565,4 +543,4 @@ python scripts/wiki-graph-viz.py [--wiki-dir wiki] [--out-dir graphify-out]
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
 - 현재 버전: **v1.6.0** (2026-04-23) — 다이어그램 표준 (Mermaid 우선 + 4색 팔레트) 추가
-- **이중 경로 동기화**: 템플릿 변경 시 워크스페이스 `outputs/Owen-WIKI/`와 외부 `/Users/owen/work/owen-wiki/` 양쪽 모두 갱신한다
+- 경로 동기화**: 템플릿 변경 시 외부 `/Users/owen/work/owen-wiki/` 갱신한다
