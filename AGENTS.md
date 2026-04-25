@@ -556,6 +556,8 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 | `scripts/backfill-confidence.py` | confidence/last_confirmed 휴리스틱 백필 | YAML 프론트매터 인플레이스 |
 | `scripts/build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율·고립 raw 식별) | `outputs/drafts/raw-to-wiki-map.{json,md}` |
 | `scripts/wiki-action-queue.py` | registry 승격·synthesis 후보·태그 정규화·raw 지식화 등급·검색 랭킹 힌트 산출 | `outputs/drafts/wiki-action-queue.{md,json}` |
+| `scripts/registry-promotion-lifecycle.py` | source registry 승격 후보의 candidate/sampled/promoted/deferred/rejected 상태 추적 | `outputs/drafts/registry-promotion-lifecycle.{md,json}` |
+| `scripts/wiki-ops-dashboard.py` | quality gate·action queue·promotion lifecycle·ontology sidecar 핵심 지표 단일 대시보드 생성 | `outputs/drafts/wiki-ops-dashboard.{md,json}` |
 | `scripts/build-ontology-sidecar.py` | 온톨로지 관계를 JSONL sidecar로 변환 (weight/evidence/path 포함) | `outputs/drafts/ontology-sidecar.{jsonl,md}` |
 | `scripts/generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`## 파생 산출물`) | wiki 페이지 인플레이스 |
 | `scripts/compute-pagerank.py` | 그래프 PageRank로 허브 페이지 식별 | `outputs/drafts/wiki-pagerank.md` |
@@ -568,8 +570,8 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 | `.github/workflows/wiki-lint.yml` | PR 시 lint 자동 실행 + 보고서 아티팩트 업로드 | GitHub Actions |
 
 **권장 운영 주기:**
-- **PR마다**: GitHub Actions로 자동 (orphans / broken-links / ontology / tags / stubs / decay / quality-gates / action-queue)
-- **주간**: `weekly-gap-report.py` cron/Task Scheduler 등록 → 갭 우선순위 + registry 승격 후보 + synthesis 후보 결정
+- **PR마다**: GitHub Actions로 자동 (orphans / broken-links / ontology / tags / stubs / decay / quality-gates / action-queue / ops-dashboard)
+- **주간**: `weekly-gap-report.py` cron/Task Scheduler 등록 → 갭 우선순위 + registry 승격 후보 + synthesis 후보 + promotion lifecycle 결정
 - **월간**: `analyze-large-hubs.py` + `compute-pagerank.py`로 구조 점검
 - **상시**: `sync-to-obsidian.ps1`을 wiki/ 변경 hook으로 등록
 
@@ -592,6 +594,32 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 - `linked`: entity/concept까지 연결됨
 - `synthesized`: synthesis 레이어에서 활용됨
 - `output-used`: outputs 산출물에서 참조된 wiki 페이지의 source로 활용됨
+
+### Operations Dashboard & Promotion Lifecycle (v1.10+)
+
+`scripts/wiki-ops-dashboard.py`는 흩어진 운영 리포트의 핵심 지표를 단일 진입점(`outputs/drafts/wiki-ops-dashboard.md`)으로 묶는다. 대시보드는 quality gate, Action Queue, registry promotion lifecycle, ontology sidecar를 함께 보여준다.
+
+`scripts/registry-promotion-lifecycle.py`는 Action Queue의 source registry 승격 후보를 상태 기반으로 관리한다.
+
+| Status | 의미 | 다음 액션 |
+|--------|------|----------|
+| `candidate` | Action Queue에서 자동 선별된 후보 | sources 대표 파일 3~5개 샘플링 |
+| `sampled` | 원본 샘플링 중 | curated summary 가치 판단 |
+| `promoted` | summary/entity/concept/synthesis 승격 완료 | `target_summary` 기록 |
+| `deferred` | 중복·저가치·시기상조로 보류 | `decision_note` 기록 |
+| `rejected` | 재검토 가치 낮음 | 근거와 함께 제외 |
+
+### Query Routing Policy (v1.10+)
+
+질의 응답 시 페이지 우선순위는 다음 순서를 따른다.
+
+1. `wiki/synthesis/` — 종합 판단·전략·교차 주제 답변의 1차 근거
+2. `wiki/entities/`, `wiki/concepts/` — 특정 제품·고객·개념의 canonical facts
+3. curated `wiki/summaries/` — 소스 기반 세부 근거
+4. `wiki/comparisons/` — 비교 질의의 직접 근거
+5. `type/source-registry` 또는 `remaining-raw-*` — raw coverage 증명·추가 조사 후보로만 사용
+
+Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위로 둔다. 단, 사용자가 raw coverage, 미수집 여부, 원본 위치, 승격 후보를 묻는 경우에는 직접 근거로 사용할 수 있다. Registry-only 페이지를 사용한 경우 답변에 “원본 등록 근거이며 curated summary는 아님”을 명시한다.
 
 ### 스케일 전환 기준
 - 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
@@ -618,5 +646,5 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.9.0** (2026-04-25) — Action Queue + CI Quality Gates 추가 (registry 승격·synthesis 후보·tag normalization·raw 지식화 등급)
+- 현재 버전: **v1.10.0** (2026-04-25) — Operations Dashboard + Registry Promotion Lifecycle + Query Routing Policy 추가
 - 경로 동기화**: 템플릿 변경 시 외부 `/Users/owen/work/owen-wiki/` 갱신한다

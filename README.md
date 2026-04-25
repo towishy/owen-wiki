@@ -3,7 +3,7 @@
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.9.0 (2026-04-25)
+**Version**: 1.10.0 (2026-04-25)
 
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 339+ 페이지 / raw 5,798 파일 / **변환율 100%** 운영 경험 기반
 
@@ -19,8 +19,9 @@
 3. **🕸️ 온톨로지 + 갭 분석** — 위키링크와 별개로 `[[A]] [관계] [[B]]` 트리플렛을 `wiki/ontology/`에 누적. 클러스터·허브·갭을 데이터로 파악.
 4. **🧲 자동 클러스터 허브 (v1.7)** — 4,000+ 파일 규모 raw/도 개별 ingest 없이 허브 페이지로 일괄 흡수. **변환율 100% 달성**.
 5. **📋 Action Queue (v1.9)** — registry 승격, synthesis 후보, 태그 정규화, raw 지식화 등급을 자동 산출.
-6. **📊 운영 검증된 스케일** — 661 페이지 / 6,000+ 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / 깨진 링크 0 / 고아 0 — 모두 실측.
-7. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
+6. **🧭 Ops Dashboard (v1.10)** — quality gate, action queue, promotion lifecycle, ontology sidecar 핵심 지표를 단일 진입점으로 통합.
+7. **📊 운영 검증된 스케일** — 661 페이지 / 6,000+ 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / 깨진 링크 0 / 고아 0 — 모두 실측.
+8. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
 
 ---
 
@@ -37,6 +38,8 @@
 | **인덱싱 비용** | 파일 추가 시 ~50 토큰 | 2-tier + Smart Diff 3-tier 전략 |
 | **대량 흡수** | 4,000+ 파일도 ingest 없이 처리 (v1.7) | [auto-cluster-hubs.py](scripts/auto-cluster-hubs.py) + [absorb-remaining-uningested.py](scripts/absorb-remaining-uningested.py) |
 | **다음 액션 자동화** | registry 승격·synthesis 후보·태그 정규화 후보 산출 (v1.9) | [wiki-action-queue.py](scripts/wiki-action-queue.py) |
+| **운영 대시보드** | 품질·큐·승격 상태·온톨로지 지표 단일 진입점 (v1.10) | [wiki-ops-dashboard.py](scripts/wiki-ops-dashboard.py) |
+| **승격 라이프사이클** | source registry 후보를 candidate→promoted 흐름으로 추적 (v1.10) | [registry-promotion-lifecycle.py](scripts/registry-promotion-lifecycle.py) |
 | **온톨로지 기계판독** | 관계 weight/evidence/path를 JSONL로 제공 (v1.9) | [build-ontology-sidecar.py](scripts/build-ontology-sidecar.py) |
 | **무결성** | 7종 lint 자동화 | tags / ontology / orphans / broken-links / confidence-decay / uningested / hub-sources |
 | **품질 게이트** | PR에서 구조 품질 기준 강제 (v1.9) | [wiki-quality-gates.py](scripts/wiki-quality-gates.py) |
@@ -54,7 +57,7 @@
 | 파일 | 용도 | 행동 |
 |------|------|------|
 | `README.md` | 이 파일 — 전체 가이드 | 읽기 |
-| `AGENTS.md` | LLM 에이전트 스키마 v1.9 (복사하여 사용) | 프로젝트 루트에 복사 |
+| `AGENTS.md` | LLM 에이전트 스키마 v1.10 (복사하여 사용) | 프로젝트 루트에 복사 |
 | `SETUP-GUIDE.md` | 단계별 설정 가이드 | 따라하기 |
 | `CHANGELOG.md` | 템플릿 킷 버전 변경 이력 | 참고 |
 | `templates/` | 위키 페이지 템플릿 5종 | `templates/`에 복사 |
@@ -108,6 +111,13 @@
 | `apply-tag-aliases.py` | `tag-aliases.yml` 기반 태그 alias 실제 적용 |
 | `weekly-gap-report.py` | Action Queue를 주간 갭 리포트에 포함 |
 
+**v1.10.0 신규 — Ops Dashboard & Promotion Lifecycle**
+
+| 스크립트 | 용도 |
+|---------|------|
+| `registry-promotion-lifecycle.py` | source registry 승격 후보를 candidate/sampled/promoted/deferred/rejected 상태로 추적 |
+| `wiki-ops-dashboard.py` | quality gate, action queue, promotion lifecycle, ontology sidecar 핵심 지표를 단일 운영 대시보드로 생성 |
+
 ---
 
 ## Quick Start (5분 세팅)
@@ -127,7 +137,7 @@ cp <path-to>/owen-wiki/AGENTS.md ./AGENTS.md
 cp <path-to>/owen-wiki/starter-files/* ./
 cp <path-to>/owen-wiki/templates/* ./templates/
 cp <path-to>/owen-wiki/ontology-templates/* ./wiki/ontology/
-cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.9.0: Action Queue + Quality Gates 포함
+cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.10.0: Ops Dashboard + Promotion Lifecycle 포함
 
 # 4. AGENTS.md를 열어 도메인/경로를 자신의 것으로 수정
 

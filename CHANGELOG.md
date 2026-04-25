@@ -5,6 +5,28 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.10.0] — 2026-04-25
+
+### Operations Dashboard + Registry Promotion Lifecycle + Query Routing Policy
+
+흩어진 운영 리포트를 단일 진입점으로 묶고, source registry 후보를 curated summary로 승격하는 상태 기반 워크플로우를 추가.
+
+**AGENTS.md 변경:**
+- `### Operations Dashboard & Promotion Lifecycle (v1.10+)` 신규 섹션 추가
+- registry 승격 상태(`candidate`, `sampled`, `promoted`, `deferred`, `rejected`) 정의
+- `### Query Routing Policy (v1.10+)` 신규 섹션 추가
+- 질의 응답 시 synthesis/entity/concept/curated summary를 우선하고, source registry는 raw coverage 근거로 후순위 사용하도록 명시
+
+**스크립트 추가/강화:**
+- `registry-promotion-lifecycle.py` — Action Queue의 source registry 후보를 상태 기반으로 추적
+- `wiki-ops-dashboard.py` — quality gate, action queue, promotion lifecycle, ontology sidecar 핵심 지표를 단일 대시보드로 생성
+- `weekly-gap-report.py` — promotion lifecycle과 operations dashboard 실행 결과 포함
+
+**CI 변경:**
+- `.github/workflows/wiki-lint.yml`에서 `wiki-ops-dashboard.py` 실행
+
+---
+
 ## [1.9.0] — 2026-04-25
 
 ### Action Queue + CI Quality Gates

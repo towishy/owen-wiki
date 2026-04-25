@@ -1,4 +1,4 @@
-"""Weekly gap analysis — orphans, broken links, stubs, decay, action queue 종합 보고서.
+"""Weekly gap analysis — orphans, broken links, stubs, decay, action queue, ops dashboard 종합 보고서.
 
 기존 스크립트 결과를 묶어 outputs/drafts/weekly-gaps-YYYY-MM-DD.md 생성.
 
@@ -39,6 +39,8 @@ def main():
     sections.append(('## 7. Raw → Wiki 변환율', run('build-raw-to-wiki-map.py')))
     sections.append(('## 8. Ontology Sidecar', run('build-ontology-sidecar.py')))
     sections.append(('## 9. Action Queue', run('wiki-action-queue.py')))
+    sections.append(('## 10. Registry Promotion Lifecycle', run('registry-promotion-lifecycle.py')))
+    sections.append(('## 11. Operations Dashboard', run('wiki-ops-dashboard.py')))
 
     lines = [
         '---', f'title: "Weekly Gap Report — {TODAY}"', 'type: report',
