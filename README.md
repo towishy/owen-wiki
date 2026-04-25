@@ -5,14 +5,14 @@
 
 **Version**: 1.12.0 (2026-04-25)
 
-**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 339+ 페이지 / raw 5,798 파일 / **변환율 100%** 운영 경험 기반
+**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 663 페이지 / 6,317 위키링크 / raw 5,907 파일 / **Microsoft Security 27/27 제품 커버리지** 운영 경험 기반
 
 **Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장 + LightRAG (HKUDS, EMNLP2025) 트리플렛/리랭킹 차용
 
 ---
 
 
-## 6가지 핵심 특징
+## 10가지 핵심 특징
 
 1. **🤖 LLM-Native KB** — AGENTS.md 하나로 인제스트·질의·점검·온톨로지·산출물까지 자율 운영. 사람은 raw 입력과 outputs 검토만.
 2. **📂 3-Layer 분리** — `raw/`(불변 입력) → `wiki/`(LLM 정제) → `outputs/`(공동 산출). 책임 경계가 깔끔.
@@ -24,6 +24,47 @@
 8. **🧪 Curation Automation (v1.12)** — registry source 샘플링, lifecycle 자동 추천, synthesis 확장 분리, 안전한 relation rewrite 지원.
 9. **📊 운영 검증된 스케일** — 663 페이지 / 6,317 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / 깨진 링크 0 / 고아 0 — 모두 실측.
 10. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
+
+---
+
+## 초기 LLM Wiki 대비 Owen-WIKI의 장점
+
+초기 LLM Wiki 패턴은 **LLM이 raw source를 읽고 마크다운 위키를 직접 작성·유지보수한다**는 단순하고 강력한 아이디어에서 출발한다. Owen-WIKI는 그 원형을 유지하면서, 실제 대규모 지식 저장소 운영에 필요한 **스키마, 품질 게이트, 온톨로지, 대량 raw 흡수, 큐레이션 자동화, 산출물 레이어**를 추가한 운영형 템플릿이다.
+
+| 영역 | 초기 LLM Wiki | Owen-WIKI Template Kit |
+|------|---------------|------------------------|
+| 기본 철학 | LLM이 raw를 읽고 wiki를 작성·유지 | 동일 철학을 `AGENTS.md` 운영 규칙으로 명문화 |
+| 구조 | Raw Sources / Wiki / Schema 중심 | `raw/` → `wiki/` → `outputs/` + `wiki/ontology/` 그래프 레이어 |
+| 지식 축적 | 마크다운 페이지와 위키링크 중심 | 663 페이지, 6,317 위키링크, 10,282 distinct raw 참조 운영 검증 |
+| 질의 방식 | 인덱스·위키링크 기반 탐색 | 5-Route 전략 + Relevance Scoring + Query Routing Policy |
+| 신뢰도 관리 | 출처 표기는 가능하지만 lifecycle 체계는 약함 | `confidence`, `last_confirmed`, `stale_after`, `supersedes` 체계 |
+| 품질 관리 | 주기적 lint 개념 중심 | broken/orphan/tag/stub/ontology quality gate + ops dashboard |
+| 대량 자료 처리 | 수동 ingest 중심 | binary extraction, auto cluster hub, remaining raw registry, promotion lifecycle |
+| 온톨로지 | 위키링크 중심 | `[[A]] [relation] [[B]]` 관계 그래프 + JSONL sidecar + relation rewrite |
+| 산출물 | 위키 자체가 주 산출물 | `outputs/reports`, `outputs/presentations`, `outputs/workshops`로 재가공 |
+| 재사용성 | 개인 지식 베이스 패턴 | 복사 가능한 템플릿 킷 + starter files + scripts + ontology templates |
+
+초기 패턴의 흐름이 다음과 같다면:
+
+```text
+raw source → LLM 요약 → wiki page → query/lint로 점진 개선
+```
+
+Owen-WIKI는 이를 운영 파이프라인으로 확장한다.
+
+```text
+raw/
+    → PII 점검
+    → 추출/클러스터링
+    → summary/entity/concept/synthesis
+    → ontology sidecar
+    → action queue
+    → lifecycle/sampling
+    → outputs 산출
+    → quality gates/dashboard
+```
+
+정리하면, 초기 LLM Wiki는 **LLM-native markdown knowledge base**의 원형이고, Owen-WIKI는 그 원형을 실제 업무·도메인 지식·대량 원본·반복 산출물에 견디도록 확장한 **LLM-native knowledge operations platform**이다. 단순함은 초기 패턴의 장점이고, 규모·신뢰도·반복 운영·재사용성은 Owen-WIKI의 장점이다.
 
 ---
 
