@@ -39,6 +39,12 @@ PRODUCT_KEYWORDS = {
     'xdr': 'prod/m365-defender-xdr',
 }
 CUSTOMER_KEYWORDS = ('hyundai', '현대', 'krafton', '크래프톤', 'naver', '네이버', 'ncsoft', '넷마블', 'kb', '농협', 'lg', 'sk')
+GENERIC_REGISTRY_PENALTIES = {
+    'outputs': 10,
+    '_templates': 8,
+    '_moc': 8,
+    'misc': 4,
+}
 
 
 def md_cell(value):
@@ -125,7 +131,7 @@ def load_pages():
 
 
 def registry_promotion_candidates(pages):
-    candidates = []
+    candidates_by_group = {}
     for page in pages:
         if not page['is_registry'] or page['slug'] == 'remaining-raw-source-registry-hub':
             continue
@@ -134,17 +140,39 @@ def registry_promotion_candidates(pages):
         customer_hit = any(key in haystack for key in CUSTOMER_KEYWORDS)
         source_score = min(page['source_count'] // 10, 10)
         score = source_score + len(product_hits) * 3 + (3 if customer_hit else 0)
+        penalties = []
+        for token, penalty in GENERIC_REGISTRY_PENALTIES.items():
+            if token in haystack:
+                score -= penalty
+                penalties.append(f'generic-{token} -{penalty}')
+        if len(product_hits) >= 7:
+            score -= 3
+            penalties.append('broad-product-mix -3')
         if 'workshop' in haystack or 'assessment' in haystack or 'architecture' in haystack:
             score += 2
         if page['source_count'] >= 20 or product_hits or customer_hit:
-            candidates.append({
+            group = registry_group_key(page['slug'])
+            candidate = {
                 'page': page['slug'],
                 'path': page['path'],
                 'score': score,
                 'sources': page['source_count'],
-                'signals': ', '.join(product_hits + (['customer'] if customer_hit else [])) or 'source-volume',
-            })
+                'signals': ', '.join(product_hits + (['customer'] if customer_hit else []) + penalties) or 'source-volume',
+                'group': group,
+            }
+            current = candidates_by_group.get(group)
+            if not current or (candidate['score'], candidate['sources']) > (current['score'], current['sources']):
+                candidates_by_group[group] = candidate
+    group_sizes = Counter(registry_group_key(page['slug']) for page in pages if page['is_registry'])
+    candidates = []
+    for candidate in candidates_by_group.values():
+        candidate['group_size'] = group_sizes.get(candidate['group'], 1)
+        candidates.append(candidate)
     return sorted(candidates, key=lambda item: (-item['score'], -item['sources'], item['page']))[:30]
+
+
+def registry_group_key(page_slug):
+    return re.sub(r'-part-\d+-([0-9a-f]{8})$', r'-parts-\1', page_slug)
 
 
 def synthesis_candidates(pages):
@@ -299,13 +327,13 @@ def render_report(data):
         f'# Wiki Action Queue — {today}', '',
         '> qmd 제외. 기존 lint가 통과한 저장소에서 다음 큐레이션/구조 개선 후보를 자동 선별한다.', '',
         '## 1. Source Registry 승격 후보', '',
-        '| 순위 | 후보 페이지 | 점수 | Sources | 근거 |',
-        '|---:|---|---:|---:|---|',
+        '| 순위 | 후보 페이지 | 점수 | Sources | 그룹 | 근거 |',
+        '|---:|---|---:|---:|---:|---|',
     ]
     for i, item in enumerate(data['registry_promotion_candidates'][:20], 1):
-        lines.append(f"| {i} | [[{md_cell(item['page'])}]] | {item['score']} | {item['sources']} | {md_cell(item['signals'])} |")
+        lines.append(f"| {i} | [[{md_cell(item['page'])}]] | {item['score']} | {item['sources']} | {item.get('group_size', 1)} | {md_cell(item['signals'])} |")
     if not data['registry_promotion_candidates']:
-        lines.append('| - | - | - | - | 후보 없음 |')
+        lines.append('| - | - | - | - | - | 후보 없음 |')
 
     lines += ['', '## 2. Synthesis 후보 테마', '', '| 순위 | 테마 | 점수 | Summary pages | 예시 |', '|---:|---|---:|---:|---|']
     for i, item in enumerate(data['synthesis_candidates'][:20], 1):

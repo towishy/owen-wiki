@@ -46,6 +46,9 @@ jobs:
       - name: Generate action queue
         run: python scripts/wiki-action-queue.py
 
+      - name: Check ontology relation quality
+        run: python scripts/check-ontology-relations.py
+
       - name: Generate operations dashboard
         run: python scripts/wiki-ops-dashboard.py
 

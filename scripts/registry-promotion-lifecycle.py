@@ -1,4 +1,5 @@
 """Maintain a registry promotion lifecycle from the action queue."""
+import argparse
 import json
 from datetime import date
 from pathlib import Path
@@ -17,6 +18,18 @@ def load_json(path, default):
     if not path.exists():
         return default
     return json.loads(path.read_text(encoding='utf-8'))
+
+
+def save_state(items):
+    payload = {
+        'updated': date.today().isoformat(),
+        'items': items,
+        'status_counts': status_counts(items),
+    }
+    STATE_JSON.parent.mkdir(parents=True, exist_ok=True)
+    STATE_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    OUT_MD.write_text(render_markdown(items), encoding='utf-8')
+    return payload
 
 
 def status_counts(items):
@@ -40,6 +53,8 @@ def merge_candidates(queue, state):
             'score': candidate.get('score', 0),
             'sources': candidate.get('sources', 0),
             'signals': candidate.get('signals', ''),
+            'group': candidate.get('group', ''),
+            'group_size': candidate.get('group_size', 1),
             'last_seen': today,
         })
         item.setdefault('status', DEFAULT_STATUS)
@@ -53,7 +68,9 @@ def merge_candidates(queue, state):
     for page, item in existing.items():
         if page not in known_pages:
             item = dict(item)
-            item.setdefault('status', 'deferred')
+            if item.get('status', DEFAULT_STATUS) == DEFAULT_STATUS:
+                item['status'] = 'deferred'
+                item['decision_note'] = item.get('decision_note') or 'action queue dedupe/score update로 현재 Top 후보에서 제외됨'
             merged.append(item)
     return sorted(merged, key=lambda item: (STATUS_ORDER.index(item.get('status', DEFAULT_STATUS)) if item.get('status', DEFAULT_STATUS) in STATUS_ORDER else 99, item.get('queue_rank', 999), -item.get('score', 0)))
 
@@ -84,8 +101,8 @@ def render_markdown(items):
         '',
         '## Promotion Board',
         '',
-        '| Rank | Page | Status | Score | Sources | Signals | Target summary | Decision note |',
-        '|---:|---|---|---:|---:|---|---|---|',
+        '| Rank | Page | Status | Score | Sources | Group | Signals | Target summary | Decision note |',
+        '|---:|---|---|---:|---:|---:|---|---|---|',
     ]
     for item in items[:50]:
         page = item.get('page', '')
@@ -93,7 +110,7 @@ def render_markdown(items):
         note = item.get('decision_note', '') or '-'
         rank = item.get('queue_rank', '-')
         lines.append(
-            f"| {rank} | [[{page}]] | `{item.get('status', DEFAULT_STATUS)}` | {item.get('score', 0)} | {item.get('sources', 0)} | {item.get('signals', '')} | {target} | {note} |"
+            f"| {rank} | [[{page}]] | `{item.get('status', DEFAULT_STATUS)}` | {item.get('score', 0)} | {item.get('sources', 0)} | {item.get('group_size', 1)} | {item.get('signals', '')} | {target} | {note} |"
         )
     lines += [
         '',
@@ -105,22 +122,52 @@ def render_markdown(items):
         '4. `deferred`: 중복·저가치·시기상조 후보는 보류하고 `decision_note`를 남긴다.',
         '5. `rejected`: PII/부적합/중복 원본처럼 재검토 가치가 낮은 경우에만 사용한다.',
         '',
+        '## CLI Usage',
+        '',
+        '```bash',
+        'python scripts/registry-promotion-lifecycle.py --set PAGE sampled --note "대표 sources 5개 샘플링 시작"',
+        'python scripts/registry-promotion-lifecycle.py --set PAGE promoted --target-summary "[[new-summary]]"',
+        '```',
+        '',
     ]
     return '\n'.join(lines)
 
 
+def apply_status_update(items, page, status, note='', target_summary='', owner=''):
+    if status not in STATUS_ORDER:
+        raise SystemExit(f'Invalid status: {status}. Expected one of: {", ".join(STATUS_ORDER)}')
+    for item in items:
+        if item.get('page') == page:
+            item['status'] = status
+            item['updated'] = date.today().isoformat()
+            if note:
+                item['decision_note'] = note
+            if target_summary:
+                item['target_summary'] = target_summary
+            if owner:
+                item['owner'] = owner
+            return item
+    raise SystemExit(f'Page not found in lifecycle: {page}')
+
+
 def main():
+    parser = argparse.ArgumentParser(description='Maintain registry promotion lifecycle state.')
+    parser.add_argument('--set', dest='page', help='Page slug to update')
+    parser.add_argument('status', nargs='?', help='New status: candidate/sampled/promoted/deferred/rejected')
+    parser.add_argument('--note', default='', help='Decision note')
+    parser.add_argument('--target-summary', default='', help='Target summary wikilink for promoted items')
+    parser.add_argument('--owner', default='', help='Owner or reviewer')
+    args = parser.parse_args()
+
     queue = load_json(ACTION_QUEUE_JSON, {'registry_promotion_candidates': []})
     state = load_json(STATE_JSON, {'items': []})
     items = merge_candidates(queue, state)
-    payload = {
-        'updated': date.today().isoformat(),
-        'items': items,
-        'status_counts': status_counts(items),
-    }
-    STATE_JSON.parent.mkdir(parents=True, exist_ok=True)
-    STATE_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    OUT_MD.write_text(render_markdown(items), encoding='utf-8')
+    if args.page:
+        if not args.status:
+            raise SystemExit('--set requires a status argument')
+        updated = apply_status_update(items, args.page, args.status, args.note, args.target_summary, args.owner)
+        print(f"Updated: {updated['page']} -> {updated['status']}")
+    save_state(items)
     print(f'Lifecycle items: {len(items)}')
     print(f'State: {STATE_JSON}')
     print(f'Report: {OUT_MD}')

@@ -60,6 +60,28 @@ topic/insider-risk:
   - topic/irm
 topic/data-exfiltration:
   - topic/exfiltration
+topic/xdr:
+  - topic/XDR
+topic/itdr:
+  - topic/ITDR
+topic/network-dlp:
+  - topic/network-DLP
+topic/apj:
+  - topic/APJ
+topic/app-governance:
+  - topic/App-Governance
+topic/kerberos:
+  - topic/Kerberos
+topic/mfa:
+  - topic/MFA
+topic/pim:
+  - topic/PIM
+topic/soar:
+  - topic/SOAR
+topic/titan:
+  - topic/TITAN
+topic/ueba:
+  - topic/UEBA
 
 # ─── type/ (문서 유형) ───
 type/summary:
@@ -77,7 +99,19 @@ type/webinar:
   - type/웨비나
 
 # ─── customer/ (고객) ───
-# 고객사 명칭은 표준화 유지 (한글 그대로)
+# 고객사 명칭은 한글 표기 우선 (영문 별칭 → 한글로 정규화)
+customer/크래프톤:
+  - customer/krafton
+customer/kb증권:
+  - customer/kb
+customer/sk하이닉스:
+  - customer/sk-hynix
+customer/네이버:
+  - customer/naver
+customer/엔씨소프트:
+  - customer/ncsoft
+customer/넷마블:
+  - customer/netmarble
 
 # ─── series/ (시리즈) ───
 series/zt-pillars:

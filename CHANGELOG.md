@@ -5,6 +5,29 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.11.0] — 2026-04-25
+
+### Operations Precision
+
+Action Queue와 운영 대시보드를 단순 후보 나열에서 “좋은 후보가 위에 뜨는” 운영 정밀도 레이어로 확장.
+
+**AGENTS.md 변경:**
+- `### Operations Precision (v1.11+)` 신규 섹션 추가
+- generic registry hub 감점, `part-*` dedupe, lifecycle CLI, relation quality, synthesis 승격 운영 원칙 명시
+
+**스크립트 추가/강화:**
+- `wiki-action-queue.py` — generic registry hub(`outputs`, `_Templates`, `_MOC`, `misc`) 감점, broad product mix 감점, `part-*` 후보 group dedupe
+- `registry-promotion-lifecycle.py` — `--set PAGE status --note ... --target-summary ...` CLI 지원, queue에서 빠진 candidate 자동 deferred 처리
+- `wiki-ops-dashboard.py` — 이전 실행 대비 delta와 ontology relation quality 요약 추가
+- `check-ontology-relations.py` — 약한 `related-to` 관계를 더 구체적인 relation으로 바꿀 후보 리포트 생성
+- `tag-aliases.yml` — 대소문자 drift 태그 alias 추가
+
+**운영 결과:**
+- Action Queue tag normalization 후보를 0으로 낮추는 운영 루프 지원
+- 큰 synthesis 후보를 curated synthesis로 승격하는 패턴을 정식화
+
+---
+
 ## [1.10.0] — 2026-04-25
 
 ### Operations Dashboard + Registry Promotion Lifecycle + Query Routing Policy

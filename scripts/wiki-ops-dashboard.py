@@ -15,6 +15,7 @@ OUT_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-ops-dashboard.json'
 ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-action-queue.json'
 LIFECYCLE_JSON = OUTPUTS_ROOT / 'drafts' / 'registry-promotion-lifecycle.json'
 ONTOLOGY_JSONL = OUTPUTS_ROOT / 'drafts' / 'ontology-sidecar.jsonl'
+RELATION_QUALITY_JSON = OUTPUTS_ROOT / 'drafts' / 'ontology-relation-quality.json'
 
 
 def run_script(name):
@@ -68,13 +69,16 @@ def ontology_counts():
 
 
 def build_payload():
+    previous = load_json(OUT_JSON, {})
     run_script('build-ontology-sidecar.py')
     run_script('wiki-action-queue.py')
     run_script('registry-promotion-lifecycle.py')
+    run_script('check-ontology-relations.py')
     gate_code, gate_output = run_script('wiki-quality-gates.py')
     action_queue = load_json(ACTION_QUEUE_JSON, {})
     lifecycle = load_json(LIFECYCLE_JSON, {'items': [], 'status_counts': {}})
-    return {
+    relation_quality = load_json(RELATION_QUALITY_JSON, {})
+    payload = {
         'updated': date.today().isoformat(),
         'quality_gates': parse_quality_gates(gate_output) | {'exit_code': gate_code},
         'action_queue': {
@@ -90,7 +94,38 @@ def build_payload():
             'top_items': lifecycle.get('items', [])[:10],
         },
         'ontology': ontology_counts(),
+        'relation_quality': relation_quality,
     }
+    payload['delta'] = compute_delta(previous, payload)
+    return payload
+
+
+def compute_delta(previous, current):
+    if not previous:
+        return {}
+    fields = {
+        'registry_promotion_candidates': ('action_queue', 'registry_promotion_candidates'),
+        'synthesis_candidates': ('action_queue', 'synthesis_candidates'),
+        'tag_normalization_candidates': ('action_queue', 'tag_normalization_candidates'),
+        'ontology_relations': ('ontology', 'relations'),
+        'weak_related_to': ('relation_quality', 'weak_related_to_count'),
+    }
+    delta = {}
+    for name, path in fields.items():
+        old = nested_get(previous, path)
+        new = nested_get(current, path)
+        if isinstance(old, int) and isinstance(new, int):
+            delta[name] = new - old
+    return delta
+
+
+def nested_get(data, path):
+    value = data
+    for key in path:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return value
 
 
 def render(payload):
@@ -98,6 +133,8 @@ def render(payload):
     action = payload['action_queue']
     lifecycle = payload['lifecycle']
     ontology = payload['ontology']
+    relation_quality = payload.get('relation_quality', {})
+    delta = payload.get('delta', {})
     today = payload['updated']
     status = 'PASS' if quality.get('passed') and quality.get('exit_code') == 0 else 'CHECK'
     lines = [
@@ -128,6 +165,16 @@ def render(payload):
         f"| Synthesis candidates | {action.get('synthesis_candidates', 0)} |",
         f"| Tag normalization candidates | {action.get('tag_normalization_candidates', 0)} |",
         f"| Registry ranking hints | {action.get('graph_registry_hints', 0)} |",
+        '',
+        '## Trend Delta',
+        '',
+        '| Metric | Delta since previous run |',
+        '|---|---:|',
+        f"| Registry promotion candidates | {delta.get('registry_promotion_candidates', 0)} |",
+        f"| Synthesis candidates | {delta.get('synthesis_candidates', 0)} |",
+        f"| Tag normalization candidates | {delta.get('tag_normalization_candidates', 0)} |",
+        f"| Ontology relations | {delta.get('ontology_relations', 0)} |",
+        f"| Weak `related-to` relations | {delta.get('weak_related_to', 0)} |",
         '',
         '### Top Registry Promotions',
         '',
@@ -173,6 +220,12 @@ def render(payload):
     for relation, count in ontology.get('by_relation', {}).items():
         lines.append(f'| `{relation}` | {count} |')
     lines += [
+        '',
+        '## Ontology Relation Quality',
+        '',
+        f"- Weak `related-to` candidates: `{relation_quality.get('weak_related_to_count', 0)}`",
+        f"- Report: `outputs/drafts/ontology-relation-quality.md`",
+        '',
         '',
         '## Next Operating Moves',
         '',
