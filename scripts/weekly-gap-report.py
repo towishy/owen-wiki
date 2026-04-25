@@ -1,4 +1,4 @@
-"""Weekly gap analysis — orphans, broken links, stubs, decay 종합 보고서.
+"""Weekly gap analysis — orphans, broken links, stubs, decay, action queue 종합 보고서.
 
 기존 스크립트 결과를 묶어 outputs/drafts/weekly-gaps-YYYY-MM-DD.md 생성.
 
@@ -20,7 +20,8 @@ OUT_PATH = OUT_DIR / f'weekly-gaps-{TODAY}.md'
 def run(name, *args):
     cmd = [sys.executable, str(SCRIPTS / name), *args]
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT, timeout=120)
+        r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT,
+                           timeout=120, encoding='utf-8', errors='replace')
         return r.stdout + ('\n[stderr]\n' + r.stderr if r.stderr else '')
     except Exception as e:
         return f'[ERROR] {name}: {e}'
@@ -36,6 +37,8 @@ def main():
     sections.append(('## 5. Ontology Health', run('check-ontology.py')))
     sections.append(('## 6. Tag Drift', run('check-tags.py')))
     sections.append(('## 7. Raw → Wiki 변환율', run('build-raw-to-wiki-map.py')))
+    sections.append(('## 8. Ontology Sidecar', run('build-ontology-sidecar.py')))
+    sections.append(('## 9. Action Queue', run('wiki-action-queue.py')))
 
     lines = [
         '---', f'title: "Weekly Gap Report — {TODAY}"', 'type: report',

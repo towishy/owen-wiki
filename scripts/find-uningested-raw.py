@@ -75,16 +75,17 @@ def collect_wiki_references() -> set[str]:
     if not WIKI.exists():
         return refs
     # 공백·한글·괄호·대괄호·작은따옴표 포함 파일명 지원. 닫는 큰따옴표·꺾쇠·줄끝에서 멈춤
-    pat = re.compile(r"raw/[^\"`<>\n]+")
+    pat = re.compile(r"raw/[^`<>\n]+")
     for md in WIKI.rglob("*.md"):
         try:
             text = md.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
         for m in pat.finditer(text):
-            path_part = m.group(0).rstrip(" \t.,;:)]")
-            # markdown 링크 ](...) 닫기 + alias |
-            path_part = path_part.split("|")[0].strip()
+            path_part = m.group(0).rstrip(" \t.,;:)]\"'")
+            # markdown 링크 ](...) 닫기. 파일명 자체에 | 문자가 들어갈 수 있으므로
+            # 여기서 Obsidian alias 분리처럼 split('|') 하지 않는다.
+            path_part = path_part.strip()
             refs.add(_norm(path_part))
     return refs
 
@@ -173,6 +174,11 @@ def human_size(n: int) -> str:
     return f"{n:.1f}GB"
 
 
+def md_cell(value: str) -> str:
+    """Escape Markdown table separators without changing the underlying path."""
+    return value.replace("|", r"\|")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top", type=int, default=20, help="콘솔에 표시할 상위 N개 (기본 20)")
@@ -215,7 +221,7 @@ def main() -> int:
     print("|" + "|".join(["---"] * len(headers)) + "|")
     for i, (s, p, sz, notes) in enumerate(candidates[: args.top], 1):
         rel = p.relative_to(ROOT).as_posix()
-        print(f"| {i} | {s} | {human_size(sz)} | `{rel}` | {', '.join(notes)} |")
+        print(f"| {i} | {s} | {human_size(sz)} | `{md_cell(rel)}` | {', '.join(notes)} |")
 
     if args.report:
         OUTPUTS.mkdir(parents=True, exist_ok=True)
@@ -238,7 +244,7 @@ def main() -> int:
             f.write("|---|---:|---:|---|---|\n")
             for i, (s, p, sz, notes) in enumerate(candidates, 1):
                 rel = p.relative_to(ROOT).as_posix()
-                f.write(f"| {i} | {s} | {human_size(sz)} | `{rel}` | {', '.join(notes)} |\n")
+                f.write(f"| {i} | {s} | {human_size(sz)} | `{md_cell(rel)}` | {', '.join(notes)} |\n")
         print(f"\n[saved] {out.relative_to(ROOT).as_posix()}", file=sys.stderr)
 
     return 0

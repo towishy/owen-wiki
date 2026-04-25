@@ -5,6 +5,32 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.9.0] — 2026-04-25
+
+### Action Queue + CI Quality Gates
+
+qmd/hybrid search 도입은 제외하고, 기존 graph/tag/source 메타데이터만으로 다음 큐레이션 우선순위를 산출하는 운영 자동화를 추가.
+
+**AGENTS.md 변경:**
+- `### Action Queue 운영 (v1.9+)` 신규 섹션 추가
+- Raw 지식화 등급(`registered`, `summarized`, `linked`, `synthesized`, `output-used`) 정의
+- 주간 운영 주기에 registry 승격 후보, synthesis 후보, tag normalization 후보 포함
+
+**스크립트 추가/강화:**
+- `wiki-action-queue.py` — source registry 승격 후보, synthesis 후보, 태그 정규화 후보, raw 지식화 등급, graph/search 랭킹 힌트 생성
+- `build-ontology-sidecar.py` — Markdown ontology를 relation weight/evidence/path 포함 JSONL로 변환
+- `wiki-quality-gates.py` — broken/orphan/tag/stub/remaining raw parent hub 링크를 CI gate로 강제
+- `apply-tag-aliases.py` — `tag-aliases.yml` 기반 태그 alias 실제 적용
+- `weekly-gap-report.py` — Action Queue 실행 결과를 주간 리포트에 포함
+- `absorb-uningested-subhubs.py` — remaining raw source registry sub-hub 생성
+- `find-uningested-raw.py` — 큰따옴표와 파이프(`|`)가 포함된 raw 파일명 매칭 보강
+
+**CI 변경:**
+- `.github/workflows/wiki-lint.yml`에서 `wiki-quality-gates.py` 실행
+- PR마다 `wiki-action-queue.py`를 생성해 보고서 아티팩트에 포함
+
+---
+
 ## [1.8.0] — 2026-04-24
 
 ### 저장소 최적화 도구 세트 (분석·자동화 스크립트 8종)

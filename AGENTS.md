@@ -412,6 +412,34 @@ count: N
 style MyNode fill:#E0F2FE,stroke:#0EA5E9,color:#075985
 ```
 
+### ML Pipeline 8색 팔레트 (역할 기반 다중 카테고리)
+
+6색 이상의 역할 구분이 필요한 파이프라인·분기 다이어그램에 사용한다 (ML 워크플로우, 의사결정 트리, 다중 분기 비교 등). 표준 4색·제품별 색상과 혼용하지 않는다.
+
+| Class | Fill | Stroke | 역할 |
+|-------|------|--------|------|
+| `prep`   | `#f4f4f9` | `#4c4c4c` | 입력/준비/시작 |
+| `train`  | `#d6eaf8` | `#2980b9` | 학습/처리/주요 작업 |
+| `eval`   | `#e8f8f5` | `#1abc9c` | 평가/검증/분석 |
+| `rf`     | `#f9ebea` | `#e74c3c` | 강조 A · 위험 · 카테고리 1 |
+| `gb`     | `#fcf3cf` | `#f39c12` | 강조 B · 주의 · 카테고리 2 |
+| `svm`    | `#ebdef0` | `#9b59b6` | 강조 C · 보조 · 카테고리 3 |
+| `select` | `#f4f4f9` | `#4c4c4c` | 분기/판단 (마름모) |
+| `deploy` | `#d5dbdb` | `#7f8c8d` | 최종/배포/완료 |
+
+적용 예시:
+```
+classDef prep  fill:#f4f4f9,stroke:#4c4c4c,stroke-width:1px
+classDef train fill:#d6eaf8,stroke:#2980b9,stroke-width:1px
+A[Data Prep]:::prep --> B[Training]:::train
+```
+
+선택 규칙:
+- 카테고리 6종 이상 / 다중 분기 비교 → ML Pipeline 8색
+- `classDef`로 정의 후 `노드:::class` 일괄 적용 (style 단건 반복 금지)
+- 한 다이어그램 내에서 표준 4색과 ML Pipeline 8색을 **혼용하지 않는다**
+- A3 PDF 출력 시 `color:#1a1a1a` 추가 권장
+
 ### 제품별 식별 색상 (필요 시만)
 
 Microsoft 제품을 시각적으로 구분해야 하는 다이어그램에만 제한적으로 사용:
@@ -511,11 +539,11 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 ### 자동 클러스터 허브 정책 (v1.7+)
 대량 raw/ 자료(고객사별 동일 워크숍 사본 등)는 개별 ingest 대신 **클러스터 허브 페이지**로 일괄 sources 등록한다.
 - **임계값**: 3개 이상 파일이 동일 클러스터 키(2~3 단계 경로) 공유 시 허브 자동 생성
-- **스크립트**: `scripts/auto-cluster-hubs.py` (자동 생성) + `scripts/absorb-remaining-uningested.py` (잔여 라우팅)
+- **스크립트**: `scripts/auto-cluster-hubs.py` (자동 생성) + `scripts/absorb-remaining-uningested.py` (잔여 라우팅) + `scripts/absorb-uningested-subhubs.py` (remaining raw sub-hub 수집)
 - **confidence**: 자동 허브는 0.55, 큐레이션 허브는 0.65, 1차 소스 summary는 0.85+
 - **본문**: 허브는 sources YAML과 클러스터 설명만 작성, 본문 큐레이션은 가치 평가 후 별도 summary로 승격
 - **SKIP 패턴**: 이미 인제스트된 클러스터(`raw/articles/mslearn/`, `raw/obsidian/` 등)는 `SKIP_PREFIX`/`SKIP_CONTAINS`로 제외
-- **scanner 매칭 규칙** (`scripts/find-uningested-raw.py`): NFC normalize + 괄호·대괄호·작은따옴표 포함 파일명 지원 필수
+- **scanner 매칭 규칙** (`scripts/find-uningested-raw.py`): NFC normalize + 괄호·대괄호·작은따옴표·큰따옴표·파이프(`|`) 포함 파일명 지원 필수
 
 ### 저장소 최적화 도구 (v1.8+)
 
@@ -527,19 +555,43 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 | `scripts/identify-stubs.py` | stub 페이지 자동 식별 (본문<200자, 무소스 등) | `outputs/drafts/stub-pages-report.md` |
 | `scripts/backfill-confidence.py` | confidence/last_confirmed 휴리스틱 백필 | YAML 프론트매터 인플레이스 |
 | `scripts/build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율·고립 raw 식별) | `outputs/drafts/raw-to-wiki-map.{json,md}` |
+| `scripts/wiki-action-queue.py` | registry 승격·synthesis 후보·태그 정규화·raw 지식화 등급·검색 랭킹 힌트 산출 | `outputs/drafts/wiki-action-queue.{md,json}` |
+| `scripts/build-ontology-sidecar.py` | 온톨로지 관계를 JSONL sidecar로 변환 (weight/evidence/path 포함) | `outputs/drafts/ontology-sidecar.{jsonl,md}` |
 | `scripts/generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`## 파생 산출물`) | wiki 페이지 인플레이스 |
 | `scripts/compute-pagerank.py` | 그래프 PageRank로 허브 페이지 식별 | `outputs/drafts/wiki-pagerank.md` |
 | `scripts/weekly-gap-report.py` | 주간 갭 분석 종합 (orphans/broken/stubs/decay) | `outputs/drafts/weekly-gaps-YYYY-MM-DD.md` |
 | `scripts/sync-to-obsidian.ps1` | wiki→외부 Obsidian 볼트 증분 동기 (`-Destination` 또는 `$env:OBSIDIAN_MIRROR`) | 파일 복사 |
 | `scripts/check-ontology.py` (강화) | 양방향 supersession 검증 + 31개 표준 관계코드 사전 | stdout |
 | `scripts/tag-aliases.yml` | 태그 정규화 매핑 사전 (정규: [별칭, ...]) | 데이터 |
+| `scripts/apply-tag-aliases.py` | `tag-aliases.yml` 기반 태그 alias 실제 적용 | wiki 페이지 인플레이스 |
+| `scripts/wiki-quality-gates.py` | CI 품질 게이트 (broken/orphan/tag/stub/registry parent hub) | stdout / exit code |
 | `.github/workflows/wiki-lint.yml` | PR 시 lint 자동 실행 + 보고서 아티팩트 업로드 | GitHub Actions |
 
 **권장 운영 주기:**
-- **PR마다**: GitHub Actions로 자동 (orphans / broken-links / ontology / tags / stubs / decay)
-- **주간**: `weekly-gap-report.py` cron/Task Scheduler 등록 → 갭 우선순위 결정
+- **PR마다**: GitHub Actions로 자동 (orphans / broken-links / ontology / tags / stubs / decay / quality-gates / action-queue)
+- **주간**: `weekly-gap-report.py` cron/Task Scheduler 등록 → 갭 우선순위 + registry 승격 후보 + synthesis 후보 결정
 - **월간**: `analyze-large-hubs.py` + `compute-pagerank.py`로 구조 점검
 - **상시**: `sync-to-obsidian.ps1`을 wiki/ 변경 hook으로 등록
+
+### Action Queue 운영 (v1.9+)
+
+`scripts/wiki-action-queue.py`는 lint가 통과한 상태에서 다음 큐레이션 우선순위를 산출한다. qmd/hybrid search 도입 전에도 기존 graph/tag/source 메타데이터만으로 운영 가능하다.
+
+| Queue | 판단 기준 | 다음 액션 |
+|-------|----------|----------|
+| Source Registry 승격 후보 | `type/source-registry` + source 수 + 제품/고객/워크숍 키워드 | 고가치 파일 샘플링 후 curated summary 생성 |
+| Synthesis 후보 | summary 페이지의 `prod/`, `topic/`, `customer/` 태그 밀도 | 종합 페이지 생성 또는 기존 synthesis 보강 |
+| 태그 정규화 후보 | `tag-aliases.yml` 별칭 + 유사 topic spelling | alias 추가 후 `migrate-tags.py` 적용 |
+| Raw 지식화 등급 | registered / summarized / linked / synthesized / output-used | registered-only 그룹을 summary 승격 후보로 처리 |
+| Graph/Search 랭킹 힌트 | high-degree source registry hub | 질의 rerank에서 downrank 또는 필터 토글 |
+| Ontology Sidecar | `[[A]] [관계] [[B]]` + page metadata | relation weight 기반 검색/랭킹/검증 입력 |
+
+**Raw 지식화 등급:**
+- `registered`: source registry에만 등록됨
+- `summarized`: curated summary에서 인용됨
+- `linked`: entity/concept까지 연결됨
+- `synthesized`: synthesis 레이어에서 활용됨
+- `output-used`: outputs 산출물에서 참조된 wiki 페이지의 source로 활용됨
 
 ### 스케일 전환 기준
 - 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
@@ -566,5 +618,5 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.8.0** (2026-04-24) — 저장소 최적화 도구 세트 추가 (분석·자동화 스크립트 8종 + check-ontology 강화 + tag-aliases.yml + GitHub Actions CI)
+- 현재 버전: **v1.9.0** (2026-04-25) — Action Queue + CI Quality Gates 추가 (registry 승격·synthesis 후보·tag normalization·raw 지식화 등급)
 - 경로 동기화**: 템플릿 변경 시 외부 `/Users/owen/work/owen-wiki/` 갱신한다

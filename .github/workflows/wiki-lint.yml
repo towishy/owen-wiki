@@ -40,6 +40,12 @@ jobs:
       - name: Check confidence decay
         run: python scripts/check-confidence-decay.py
 
+      - name: Enforce quality gates
+        run: python scripts/wiki-quality-gates.py
+
+      - name: Generate action queue
+        run: python scripts/wiki-action-queue.py
+
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
