@@ -5,6 +5,30 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.12.0] — 2026-04-25
+
+### Curation Automation
+
+Action Queue와 relation quality 리포트를 “볼거리”에서 실제 큐레이션 실행 도구로 연결.
+
+**AGENTS.md 변경:**
+- `### Curation Automation (v1.12+)` 신규 섹션 추가
+- registry source sampling, lifecycle recommendation, synthesis expansion 분리, safe relation rewrite 운영 원칙 명시
+- 현재 규모 갱신: 663 pages / 6,317 wikilinks / 600 tags / graph 698 nodes, 3,608 edges
+
+**스크립트 추가/강화:**
+- `sample-registry-candidate.py` — registry 후보의 sources에서 대표 3~5개 샘플링 패킷 생성
+- `apply-ontology-relation-suggestions.py` — `related-to` 안전 치환 후보를 dry-run/apply로 반영
+- `registry-promotion-lifecycle.py` — 후보별 `recommended_status`, `recommendation_reason` 자동 부여
+- `wiki-action-queue.py` — 신규 synthesis 후보와 기존 synthesis 확장 후보 분리
+- `check-ontology.py` — `synthesizes` relation code를 canonical set에 추가
+
+**운영 결과:**
+- safe ontology rewrite 25건 적용: weak `related-to` 172 → 147
+- `[[sentinel-operations-overview]]` synthesis 승격 패턴을 템플릿 운영 사례로 반영
+
+---
+
 ## [1.11.0] — 2026-04-25
 
 ### Operations Precision

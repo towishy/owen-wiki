@@ -176,11 +176,13 @@ def registry_group_key(page_slug):
 
 
 def synthesis_candidates(pages):
-    existing = set()
+    existing = {}
     for page in pages:
         if page['category'] == 'synthesis':
-            existing.update(tag for tag in page['tags'] if tag.startswith(('prod/', 'topic/', 'customer/')))
-            existing.add(page['slug'])
+            for tag in page['tags']:
+                if tag.startswith(('prod/', 'topic/', 'customer/')):
+                    existing.setdefault(tag, []).append(page['slug'])
+            existing.setdefault(page['slug'], []).append(page['slug'])
 
     grouped = Counter()
     examples = defaultdict(list)
@@ -194,21 +196,29 @@ def synthesis_candidates(pages):
                 examples[tag].append(page['slug'])
 
     rows = []
+    expansion_rows = []
     for tag, count in grouped.most_common():
         if count < 5:
             continue
-        represented = tag in existing
-        score = count - (5 if represented else 0)
-        if score <= 0:
-            continue
-        rows.append({
+        represented_by = existing.get(tag, [])
+        row = {
             'theme': tag,
-            'score': score,
+            'score': count,
             'summary_pages': count,
-            'represented': represented,
+            'represented': bool(represented_by),
+            'represented_by': represented_by,
             'examples': examples[tag],
-        })
-    return sorted(rows, key=lambda item: (-item['score'], item['theme']))[:25]
+        }
+        if represented_by:
+            row['next_action'] = 'expand-existing-synthesis'
+            expansion_rows.append(row)
+        else:
+            row['next_action'] = 'create-new-synthesis'
+            rows.append(row)
+    return (
+        sorted(rows, key=lambda item: (-item['score'], item['theme']))[:25],
+        sorted(expansion_rows, key=lambda item: (-item['score'], item['theme']))[:25],
+    )
 
 
 def load_alias_values():
@@ -335,11 +345,19 @@ def render_report(data):
     if not data['registry_promotion_candidates']:
         lines.append('| - | - | - | - | - | 후보 없음 |')
 
-    lines += ['', '## 2. Synthesis 후보 테마', '', '| 순위 | 테마 | 점수 | Summary pages | 예시 |', '|---:|---|---:|---:|---|']
+    lines += ['', '## 2. 신규 Synthesis 후보 테마', '', '| 순위 | 테마 | 점수 | Summary pages | 예시 |', '|---:|---|---:|---:|---|']
     for i, item in enumerate(data['synthesis_candidates'][:20], 1):
         examples = ', '.join(f"[[{example}]]" for example in item['examples'][:3])
         lines.append(f"| {i} | `{item['theme']}` | {item['score']} | {item['summary_pages']} | {examples} |")
     if not data['synthesis_candidates']:
+        lines.append('| - | - | - | - | 후보 없음 |')
+
+    lines += ['', '### 기존 Synthesis 확장 후보', '', '| 순위 | 테마 | 점수 | 대표 Synthesis | 예시 |', '|---:|---|---:|---|---|']
+    for i, item in enumerate(data.get('synthesis_expansion_candidates', [])[:15], 1):
+        represented = ', '.join(f"[[{page}]]" for page in item.get('represented_by', [])[:3])
+        examples = ', '.join(f"[[{example}]]" for example in item['examples'][:3])
+        lines.append(f"| {i} | `{item['theme']}` | {item['score']} | {represented} | {examples} |")
+    if not data.get('synthesis_expansion_candidates'):
         lines.append('| - | - | - | - | 후보 없음 |')
 
     lines += ['', '## 3. 태그 정규화 후보', '', '| 태그 | 사용 수 | 제안 | 이유 |', '|---|---:|---|---|']
@@ -378,10 +396,12 @@ def render_report(data):
 def main():
     pages = load_pages()
     raw_counts, registered_groups = raw_quality_grades(pages)
+    new_synthesis, expansion_synthesis = synthesis_candidates(pages)
     data = {
         'generated': date.today().isoformat(),
         'registry_promotion_candidates': registry_promotion_candidates(pages),
-        'synthesis_candidates': synthesis_candidates(pages),
+        'synthesis_candidates': new_synthesis,
+        'synthesis_expansion_candidates': expansion_synthesis,
         'tag_normalization_candidates': tag_normalization_candidates(pages),
         'raw_quality_counts': dict(raw_counts),
         'registered_only_groups': registered_groups,

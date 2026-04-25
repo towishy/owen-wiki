@@ -18,7 +18,12 @@ CANONICAL_RELATIONS = {
     'triggers', 'enables', 'requires', 'supports', 'deploys',
     'feeds', 'receives-signal-from', 'uses-signal', 'audited-via',
     # 확장 — 콘텐츠
-    'covers', 'documents', 'teaches', 'solves',
+    'covers', 'documents', 'teaches', 'solves', 'synthesizes',
+    # v2 추가 (실사용 기반, 2026-04-24)
+    'complements', 'created-by', 'demonstrates', 'describes', 'developed-by',
+    'enforced-via', 'evaluated-with', 'evaluates', 'extended-by', 'hosted-on',
+    'implemented-by', 'integrates', 'invalidated-by', 'issued-by', 'led-by',
+    'partners-with',
 }
 
 # Collect all wiki page names + frontmatter for supersession
@@ -29,12 +34,12 @@ fm_re = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
 list_re = re.compile(r'\[\[([^\[\]|]+?)(?:\|[^\]]+?)?\]\]')
 
 for root, dirs, files in os.walk('wiki'):
-    if 'ontology' in root:
-        continue
     for f in files:
         if f.endswith('.md') and f not in ('_index.md', 'README.md'):
             name = f[:-3]
             wiki_pages.add(name)
+            if 'ontology' in root:
+                continue
             try:
                 content = open(os.path.join(root, f), encoding='utf-8').read()
             except Exception:
@@ -72,7 +77,8 @@ print()
 # Check each ontology file
 link_pat = re.compile(r'\[\[([^\[\]|]+?)(?:\|[^\]]+?)?\]\]')
 relation_pat = re.compile(r'\]\]\s*\[([a-z\-]+)\]\s*\[\[')
-meta_refs = {'위키링크', 'Source', 'Target', 'page-name', 'PageName', '페이지명', '페이지1', '페이지2'}
+meta_refs = {'위키링크', 'Source', 'Target', 'page-name', 'PageName', '페이지명', '페이지1', '페이지2', '_index'}
+canonical_relations_doc = {'relation'}  # placeholder used in templates/examples
 
 ontology_dir = 'wiki/ontology'
 nonstandard_relations = set()
@@ -97,6 +103,8 @@ for f in sorted(os.listdir(ontology_dir)):
     # Extract relation codes
     for m in relation_pat.finditer(content):
         rel = m.group(1)
+        if rel in canonical_relations_doc:
+            continue
         if rel not in CANONICAL_RELATIONS:
             nonstandard_relations.add((f, rel))
 

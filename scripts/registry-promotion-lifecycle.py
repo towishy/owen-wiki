@@ -57,6 +57,9 @@ def merge_candidates(queue, state):
             'group_size': candidate.get('group_size', 1),
             'last_seen': today,
         })
+        recommendation, reason = recommend_status(item)
+        item['recommended_status'] = recommendation
+        item['recommendation_reason'] = reason
         item.setdefault('status', DEFAULT_STATUS)
         item.setdefault('owner', '')
         item.setdefault('decision_note', '')
@@ -73,6 +76,26 @@ def merge_candidates(queue, state):
                 item['decision_note'] = item.get('decision_note') or 'action queue dedupe/score update로 현재 Top 후보에서 제외됨'
             merged.append(item)
     return sorted(merged, key=lambda item: (STATUS_ORDER.index(item.get('status', DEFAULT_STATUS)) if item.get('status', DEFAULT_STATUS) in STATUS_ORDER else 99, item.get('queue_rank', 999), -item.get('score', 0)))
+
+
+def recommend_status(item):
+    signals = item.get('signals', '').lower()
+    score = int(item.get('score') or 0)
+    sources = int(item.get('sources') or 0)
+    group_size = int(item.get('group_size') or 1)
+    if item.get('target_summary'):
+        return 'promoted', 'target_summary가 기록되어 승격 완료 후보'
+    if 'generic-outputs' in signals or 'generic-_templates' in signals or 'generic-_moc' in signals:
+        return 'deferred', 'generic registry 성격이 강해 직접 summary 승격 우선순위 낮음'
+    if 'customer' in signals and (score >= 15 or sources >= 20):
+        return 'sampled', '고객 신호와 충분한 source 수가 있어 대표 원본 샘플링 권장'
+    if any(token in signals for token in ('prod/sentinel', 'prod/entra', 'prod/mde', 'prod/purview', 'prod/security-copilot')) and sources >= 10:
+        return 'sampled', '제품 신호와 source 수가 충분해 curated summary 후보'
+    if group_size >= 5 and sources >= 40:
+        return 'sampled', '대형 part 그룹 대표 후보라 샘플링 후 하위 분할 판단 필요'
+    if score <= 3:
+        return 'deferred', '점수가 낮아 상위 큐레이션 후보에서 후순위'
+    return 'candidate', '추가 신호 확인 필요'
 
 
 def render_markdown(items):
@@ -101,8 +124,8 @@ def render_markdown(items):
         '',
         '## Promotion Board',
         '',
-        '| Rank | Page | Status | Score | Sources | Group | Signals | Target summary | Decision note |',
-        '|---:|---|---|---:|---:|---:|---|---|---|',
+        '| Rank | Page | Status | Recommended | Score | Sources | Group | Signals | Target summary | Decision note |',
+        '|---:|---|---|---|---:|---:|---:|---|---|---|',
     ]
     for item in items[:50]:
         page = item.get('page', '')
@@ -110,9 +133,16 @@ def render_markdown(items):
         note = item.get('decision_note', '') or '-'
         rank = item.get('queue_rank', '-')
         lines.append(
-            f"| {rank} | [[{page}]] | `{item.get('status', DEFAULT_STATUS)}` | {item.get('score', 0)} | {item.get('sources', 0)} | {item.get('group_size', 1)} | {item.get('signals', '')} | {target} | {note} |"
+            f"| {rank} | [[{page}]] | `{item.get('status', DEFAULT_STATUS)}` | `{item.get('recommended_status', '-')}` | {item.get('score', 0)} | {item.get('sources', 0)} | {item.get('group_size', 1)} | {item.get('signals', '')} | {target} | {note} |"
         )
     lines += [
+        '',
+        '## Recommendation Rules',
+        '',
+        '- `sampled`: 고객/제품 신호가 강하거나 대형 part 그룹 대표 후보인 경우.',
+        '- `deferred`: outputs/templates/MOC 등 generic registry 성격이 강하거나 점수가 낮은 경우.',
+        '- `promoted`: `target_summary`가 기록된 경우.',
+        '- `candidate`: 자동 추천 근거가 약해 사람 검토가 필요한 경우.',
         '',
         '## Lifecycle Rules',
         '',

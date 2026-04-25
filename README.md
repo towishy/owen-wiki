@@ -3,7 +3,7 @@
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.11.0 (2026-04-25)
+**Version**: 1.12.0 (2026-04-25)
 
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 339+ 페이지 / raw 5,798 파일 / **변환율 100%** 운영 경험 기반
 
@@ -21,8 +21,9 @@
 5. **📋 Action Queue (v1.9)** — registry 승격, synthesis 후보, 태그 정규화, raw 지식화 등급을 자동 산출.
 6. **🧭 Ops Dashboard (v1.10)** — quality gate, action queue, promotion lifecycle, ontology sidecar 핵심 지표를 단일 진입점으로 통합.
 7. **🎚️ Operations Precision (v1.11)** — registry 후보 scoring/dedupe, lifecycle CLI, relation quality, tag drift 0 목표 상태를 운영 자동화에 포함.
-8. **📊 운영 검증된 스케일** — 661 페이지 / 6,000+ 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / 깨진 링크 0 / 고아 0 — 모두 실측.
-9. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
+8. **🧪 Curation Automation (v1.12)** — registry source 샘플링, lifecycle 자동 추천, synthesis 확장 분리, 안전한 relation rewrite 지원.
+9. **📊 운영 검증된 스케일** — 663 페이지 / 6,317 위키링크 / **Microsoft Security 27/27 제품 100% 커버** / 깨진 링크 0 / 고아 0 — 모두 실측.
+10. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
 
 ---
 
@@ -42,8 +43,10 @@
 | **후보 품질 정밀화** | generic registry 감점·part 후보 dedupe·broad product mix 감점 (v1.11) | [wiki-action-queue.py](scripts/wiki-action-queue.py) |
 | **운영 대시보드** | 품질·큐·승격 상태·온톨로지 지표 단일 진입점 (v1.10) | [wiki-ops-dashboard.py](scripts/wiki-ops-dashboard.py) |
 | **승격 라이프사이클** | source registry 후보를 candidate→promoted 흐름으로 추적 (v1.10) | [registry-promotion-lifecycle.py](scripts/registry-promotion-lifecycle.py) |
+| **대표 원본 샘플링** | registry 후보의 sources 3~5개를 자동 선별 (v1.12) | [sample-registry-candidate.py](scripts/sample-registry-candidate.py) |
 | **온톨로지 기계판독** | 관계 weight/evidence/path를 JSONL로 제공 (v1.9) | [build-ontology-sidecar.py](scripts/build-ontology-sidecar.py) |
 | **관계 품질 개선** | 약한 `related-to` 관계 치환 후보 산출 (v1.11) | [check-ontology-relations.py](scripts/check-ontology-relations.py) |
+| **관계 정밀화 적용** | 안전한 `related-to` 치환을 dry-run/apply로 실행 (v1.12) | [apply-ontology-relation-suggestions.py](scripts/apply-ontology-relation-suggestions.py) |
 | **무결성** | 7종 lint 자동화 | tags / ontology / orphans / broken-links / confidence-decay / uningested / hub-sources |
 | **품질 게이트** | PR에서 구조 품질 기준 강제 (v1.9) | [wiki-quality-gates.py](scripts/wiki-quality-gates.py) |
 | **도메인 깊이** | MS Security 100% | 5축 태그 체계 596종 |
@@ -60,14 +63,14 @@
 | 파일 | 용도 | 행동 |
 |------|------|------|
 | `README.md` | 이 파일 — 전체 가이드 | 읽기 |
-| `AGENTS.md` | LLM 에이전트 스키마 v1.11 (복사하여 사용) | 프로젝트 루트에 복사 |
+| `AGENTS.md` | LLM 에이전트 스키마 v1.12 (복사하여 사용) | 프로젝트 루트에 복사 |
 | `SETUP-GUIDE.md` | 단계별 설정 가이드 | 따라하기 |
 | `CHANGELOG.md` | 템플릿 킷 버전 변경 이력 | 참고 |
 | `templates/` | 위키 페이지 템플릿 5종 | `templates/`에 복사 |
 | `starter-files/` | index.md, log.md, overview.md 초기본 | 프로젝트 루트에 복사 |
 | `ontology-templates/` | 온톨로지 파일 초기본 | `wiki/ontology/`에 복사 |
 
-### 스크립트 22종+ (`scripts/`)
+### 스크립트 24종+ (`scripts/`)
 
 **기본 lint·통계 (8종)**
 
@@ -130,6 +133,15 @@
 | `wiki-ops-dashboard.py` | 이전 실행 대비 delta와 ontology relation quality 요약 표시 |
 | `check-ontology-relations.py` | 약한 `related-to` 관계를 더 구체적인 relation으로 바꿀 후보 리포트 생성 |
 
+**v1.12.0 신규 — Curation Automation**
+
+| 스크립트 | 용도 |
+|---------|------|
+| `sample-registry-candidate.py` | registry 후보 sources에서 대표 파일 3~5개 샘플링 패킷 생성 |
+| `apply-ontology-relation-suggestions.py` | 안전한 ontology relation rewrite를 dry-run/apply로 실행 |
+| `registry-promotion-lifecycle.py` | 후보별 `recommended_status`와 `recommendation_reason` 자동 부여 |
+| `wiki-action-queue.py` | 신규 synthesis 후보와 기존 synthesis 확장 후보 분리 |
+
 ---
 
 ## Quick Start (5분 세팅)
@@ -149,7 +161,7 @@ cp <path-to>/owen-wiki/AGENTS.md ./AGENTS.md
 cp <path-to>/owen-wiki/starter-files/* ./
 cp <path-to>/owen-wiki/templates/* ./templates/
 cp <path-to>/owen-wiki/ontology-templates/* ./wiki/ontology/
-cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.11.0: Operations Precision 포함
+cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.12.0: Curation Automation 포함
 
 # 4. AGENTS.md를 열어 도메인/경로를 자신의 것으로 수정
 
