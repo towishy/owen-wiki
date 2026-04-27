@@ -5,6 +5,13 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.12.1] — 2026-04-28
+
+### README Presentation Polish
+
+- README 상단에 release/license/LLM Wiki/Ontology/Quality Gates 상태 배지 추가
+- 현재 버전 표기를 v1.12.1로 갱신
+
 ## [1.12.0] — 2026-04-25
 
 ### Curation Automation
