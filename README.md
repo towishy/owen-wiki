@@ -1,4 +1,8 @@
+![Owen Markdown knowledge work stack](assets/repository-picks.svg)
+
 # Owen-WIKI Template Kit
+
+Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산출물로 정리할 수 있도록 만든 Markdown 기반 지식 운영 템플릿이다. Owen Graphite, Owen Editor와 함께 수집부터 보고서 작성까지 이어지는 Obsidian 중심 작업 흐름의 핵심 스택을 구성한다.
 
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.

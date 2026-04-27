@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Owen Markdown Knowledge Work Stack</title>
+  <desc id="desc">Owen WIKI, Owen Graphite, Owen Editor repository picks for LLM wiki and Obsidian writing workflows.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef4ff"/>
+      <stop offset="0.58" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#e7f6f3"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#52637a" flood-opacity="0.16"/>
+    </filter>
+    <style>
+      .label{font:700 15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .title{font:800 40px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#111827}
+      .subtitle{font:500 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#475569}
+      .cardTitle{font:800 20px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#111827}
+      .cardSub{font:500 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+      .body{font:800 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#111827}
+      .bullet{font:500 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#334155}
+      .small{font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#334155}
+      .metric{font:800 17px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#2563eb}
+      .metricLabel{font:600 8px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#64748b}
+    </style>
+  </defs>
+
+  <rect width="1280" height="720" fill="#ffffff"/>
+  <rect x="24" y="24" width="1232" height="672" rx="22" fill="url(#bg)" stroke="#cbd5e1"/>
+  <text x="51" y="51" class="label">towishy GitHub Repository Picks</text>
+  <text x="51" y="96" class="title">LLM Wiki부터 Obsidian 작성 환경까지 이어지는</text>
+  <text x="51" y="132" class="title">지식 작업 스택</text>
+  <text x="1228" y="60" class="subtitle" text-anchor="end">수집, 정제, 작성, 출력을 하나의 흐름으로 묶는 Owen의</text>
+  <text x="1228" y="84" class="subtitle" text-anchor="end">Markdown 기반 도구 모음.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="51" y="164" width="380" height="492" rx="5" fill="#ffffff" stroke="#d8e0ea"/>
+    <rect x="51" y="164" width="380" height="64" rx="5" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="69" y="181" width="33" height="33" rx="7" fill="#1f7ae0"/>
+    <text x="85.5" y="204" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="18" font-weight="800" fill="#ffffff" text-anchor="middle">W</text>
+    <text x="111" y="195" class="cardTitle">Owen WIKI</text>
+    <text x="111" y="211" class="cardSub">LLM-native knowledge operations template</text>
+    <rect x="66" y="243" width="350" height="185" rx="5" fill="#f2f6fb" stroke="#d7e0ea"/>
+    <rect x="66" y="243" width="350" height="28" rx="5" fill="#e9eff6"/>
+    <circle cx="79" cy="255" r="3" fill="#94a3b8"/><circle cx="90" cy="255" r="3" fill="#94a3b8"/><circle cx="101" cy="255" r="3" fill="#94a3b8"/>
+    <rect x="87" y="277" width="57" height="6" rx="2" fill="#cbd5e1"/>
+    <rect x="75" y="292" width="49" height="6" rx="2" fill="#93c5fd"/>
+    <rect x="75" y="307" width="60" height="6" rx="2" fill="#cbd5e1"/>
+    <rect x="75" y="322" width="43" height="6" rx="2" fill="#99f6e4"/>
+    <rect x="75" y="337" width="54" height="6" rx="2" fill="#cbd5e1"/>
+    <rect x="75" y="352" width="39" height="6" rx="2" fill="#d8b4fe"/>
+    <rect x="164" y="279" width="75" height="39" rx="5" fill="#eff6ff" stroke="#dbeafe"/>
+    <text x="172" y="298" class="metric">663</text><text x="172" y="311" class="metricLabel">pages</text>
+    <rect x="246" y="279" width="75" height="39" rx="5" fill="#eff6ff" stroke="#dbeafe"/>
+    <text x="253" y="298" class="metric">6,317</text><text x="253" y="311" class="metricLabel">wikilinks</text>
+    <rect x="328" y="279" width="75" height="39" rx="5" fill="#eff6ff" stroke="#dbeafe"/>
+    <text x="336" y="298" class="metric">0</text><text x="336" y="311" class="metricLabel">broken links</text>
+    <rect x="164" y="332" width="55" height="38" rx="5" fill="#ffffff" stroke="#dbe3ec"/><text x="181" y="354" class="small">raw</text>
+    <rect x="226" y="332" width="55" height="38" rx="5" fill="#ffffff" stroke="#dbe3ec"/><text x="243" y="354" class="small">wiki</text>
+    <rect x="287" y="332" width="55" height="38" rx="5" fill="#ffffff" stroke="#dbe3ec"/><text x="303" y="354" class="small">ontology</text>
+    <rect x="348" y="332" width="55" height="38" rx="5" fill="#ffffff" stroke="#dbe3ec"/><text x="364" y="354" class="small">outputs</text>
+    <path d="M169 389 L235 424 L292 398 L347 424 L388 403" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+    <circle cx="169" cy="386" r="7" fill="#3b82f6"/><circle cx="388" cy="400" r="7" fill="#10b981"/>
+    <text x="68" y="458" class="body">대규모 원본 자료를 LLM이 운영 가능한 위키와</text>
+    <text x="68" y="481" class="body">온톨로지로 정리합니다.</text>
+    <circle cx="71" cy="499" r="3" fill="#2563eb"/><text x="82" y="503" class="bullet">raw, wiki, ontology, outputs 레이어 분리</text>
+    <circle cx="71" cy="521" r="3" fill="#2563eb"/><text x="82" y="525" class="bullet">품질 게이트, 액션 큐, 운영 대시보드 포함</text>
+    <circle cx="71" cy="543" r="3" fill="#2563eb"/><text x="82" y="547" class="bullet">보고서와 발표 자료까지 재가공하는 템플릿 킷</text>
+    <rect x="68" y="628" width="345" height="29" rx="5" fill="#f8fafc" stroke="#dbe3ec"/>
+    <text x="241" y="647" class="small" text-anchor="middle">github.com/towishy/owen-wiki</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="450" y="164" width="380" height="492" rx="5" fill="#ffffff" stroke="#d8e0ea"/>
+    <rect x="450" y="164" width="380" height="64" rx="5" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="468" y="181" width="33" height="33" rx="7" fill="#1f2937"/>
+    <text x="484.5" y="204" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="18" font-weight="800" fill="#ffffff" text-anchor="middle">G</text>
+    <text x="510" y="195" class="cardTitle">Owen Graphite</text>
+    <text x="510" y="211" class="cardSub">Obsidian report-focused light and dark theme</text>
+    <rect x="465" y="243" width="350" height="185" rx="5" fill="#f2f6fb" stroke="#d7e0ea"/>
+    <rect x="465" y="243" width="350" height="23" rx="5" fill="#e9eff6"/>
+    <circle cx="475" cy="254" r="3" fill="#ef4444"/><circle cx="485" cy="254" r="3" fill="#f59e0b"/><circle cx="495" cy="254" r="3" fill="#22c55e"/>
+    <rect x="512" y="272" width="230" height="10" rx="2" fill="#dbeafe"/>
+    <rect x="562" y="357" width="170" height="7" rx="2" fill="#67e8f9"/>
+    <rect x="562" y="379" width="155" height="4" rx="2" fill="#cbd5e1"/>
+    <rect x="562" y="388" width="190" height="4" rx="2" fill="#cbd5e1"/>
+    <rect x="724" y="338" width="61" height="44" rx="4" fill="#ffffff" stroke="#dbe3ec"/>
+    <rect x="731" y="353" width="48" height="6" rx="2" fill="#bae6fd"/>
+    <circle cx="773" cy="367" r="8" fill="#67e8f9"/>
+    <text x="468" y="458" class="body">한국어 보고서와 기술 문서를 위한 차분한 Graphite 기반</text>
+    <text x="468" y="481" class="body">Obsidian 테마입니다.</text>
+    <circle cx="470" cy="499" r="3" fill="#334155"/><text x="482" y="503" class="bullet">A3 PDF, 표지, 헤더 자동 넘버링 지원</text>
+    <circle cx="470" cy="521" r="3" fill="#334155"/><text x="482" y="525" class="bullet">Live Preview와 Reading View 시각 동기화</text>
+    <circle cx="470" cy="543" r="3" fill="#334155"/><text x="482" y="547" class="bullet">Style Settings 27개 옵션과 모바일 대응</text>
+    <rect x="467" y="628" width="345" height="29" rx="5" fill="#f8fafc" stroke="#dbe3ec"/>
+    <text x="640" y="647" class="small" text-anchor="middle">github.com/towishy/Owen-Graphite</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="849" y="164" width="380" height="492" rx="5" fill="#ffffff" stroke="#d8e0ea"/>
+    <rect x="849" y="164" width="380" height="64" rx="5" fill="#ffffff" stroke="#e2e8f0"/>
+    <rect x="867" y="181" width="33" height="33" rx="7" fill="#6d4df2"/>
+    <text x="883.5" y="204" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="18" font-weight="800" fill="#ffffff" text-anchor="middle">E</text>
+    <text x="909" y="195" class="cardTitle">Owen Editor</text>
+    <text x="909" y="211" class="cardSub">Obsidian Markdown UI editor plugin</text>
+    <rect x="864" y="243" width="350" height="185" rx="5" fill="#f2f6fb" stroke="#d7e0ea"/>
+    <rect x="864" y="243" width="350" height="28" rx="5" fill="#e9eff6"/>
+    <circle cx="877" cy="255" r="3" fill="#94a3b8"/><circle cx="888" cy="255" r="3" fill="#94a3b8"/><circle cx="899" cy="255" r="3" fill="#94a3b8"/>
+    <rect x="877" y="276" width="320" height="17" rx="3" fill="#ffffff" stroke="#dbe3ec"/>
+    <g fill="#e2e8f0" stroke="#cbd5e1">
+      <rect x="879" y="309" width="17" height="17" rx="2"/><rect x="900" y="309" width="17" height="17" rx="2"/><rect x="921" y="309" width="17" height="17" rx="2"/>
+      <rect x="942" y="309" width="17" height="17" rx="2"/><rect x="963" y="309" width="17" height="17" rx="2"/><rect x="984" y="309" width="17" height="17" rx="2"/>
+      <rect x="1005" y="309" width="17" height="17" rx="2"/><rect x="1026" y="309" width="17" height="17" rx="2"/><rect x="1047" y="309" width="17" height="17" rx="2"/>
+      <rect x="1068" y="309" width="17" height="17" rx="2"/><rect x="1089" y="309" width="17" height="17" rx="2"/><rect x="1110" y="309" width="17" height="17" rx="2"/>
+      <rect x="1131" y="309" width="17" height="17" rx="2"/><rect x="1152" y="309" width="17" height="17" rx="2"/><rect x="1173" y="309" width="17" height="17" rx="2"/>
+    </g>
+    <rect x="933" y="341" width="210" height="79" rx="4" fill="#ffffff" stroke="#dbe3ec"/>
+    <text x="946" y="357" class="small">Selection Tools</text>
+    <rect x="945" y="366" width="66" height="18" rx="3" fill="#eff6ff" stroke="#bfdbfe"/><text x="954" y="379" class="metricLabel">Comment</text>
+    <rect x="1018" y="366" width="53" height="18" rx="3" fill="#f8fafc" stroke="#dbe3ec"/><text x="1030" y="379" class="metricLabel">Info</text>
+    <rect x="1079" y="366" width="53" height="18" rx="3" fill="#f8fafc" stroke="#dbe3ec"/><text x="1090" y="379" class="metricLabel">Note</text>
+    <rect x="945" y="390" width="55" height="18" rx="3" fill="#f8fafc" stroke="#dbe3ec"/><text x="956" y="403" class="metricLabel">Danger</text>
+    <rect x="1007" y="390" width="67" height="18" rx="3" fill="#f8fafc" stroke="#dbe3ec"/><text x="1017" y="403" class="metricLabel">Important</text>
+    <rect x="1081" y="390" width="53" height="18" rx="3" fill="#f8fafc" stroke="#dbe3ec"/><text x="1091" y="403" class="metricLabel">Success</text>
+    <text x="867" y="458" class="body">Markdown 편집을 빠르게 만드는 플로팅 클래스 툴바와</text>
+    <text x="867" y="481" class="body">팔레트를 제공합니다.</text>
+    <circle cx="870" cy="499" r="3" fill="#6d4df2"/><text x="882" y="503" class="bullet">선택 영역 미니 툴바와 위치 조절 가능한 편집 툴바</text>
+    <circle cx="870" cy="521" r="3" fill="#6d4df2"/><text x="882" y="525" class="bullet">표, 콜아웃, 링크, 템플릿, 하이라이트 지원</text>
+    <circle cx="870" cy="543" r="3" fill="#6d4df2"/><text x="882" y="547" class="bullet">Owen Graphite용 보고서 스니펫과 프리셋 제공</text>
+    <rect x="866" y="628" width="345" height="29" rx="5" fill="#f8fafc" stroke="#dbe3ec"/>
+    <text x="1039" y="647" class="small" text-anchor="middle">github.com/towishy/owen-editor</text>
+  </g>
+</svg>
