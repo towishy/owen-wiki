@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="768" viewBox="0 0 1440 768" role="img" aria-labelledby="title desc">
+  <title id="title">Owen AI 문서 제작 병합 모델</title>
+  <desc id="desc">Owen Graphite와 Owen Editor를 결합한 문서 제작 워크플로우 다이어그램</desc>
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#eef5ff"/>
+      <stop offset="1" stop-color="#eafaf1"/>
+    </linearGradient>
+    <linearGradient id="center" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8ea"/>
+      <stop offset="1" stop-color="#fff0df"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.14"/>
+    </filter>
+    <filter id="softShadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 34px; font-weight: 800; fill: #0f172a; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 18px; font-weight: 500; fill: #334155; }
+      .card-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 26px; font-weight: 800; }
+      .card-subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; font-weight: 500; fill: #334155; }
+      .section { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 17px; font-weight: 800; fill: #0f172a; }
+      .body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 15px; font-weight: 500; fill: #1f2937; }
+      .step { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 17px; font-weight: 800; fill: #111827; }
+      .principle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 17px; font-weight: 500; fill: #1f2937; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1440" height="768"/>
+
+  <rect x="51" y="31" width="1338" height="114" rx="22" fill="url(#hero)" stroke="#cbd5e1" filter="url(#softShadow)"/>
+  <text x="720" y="77" text-anchor="middle" class="title">Owen AI 문서 제작 병합 모델</text>
+  <text x="720" y="116" text-anchor="middle" class="subtitle">Graphite는 문서 설계 원칙, Editor는 실행 가능한 삽입 문법을 담당한다.</text>
+
+  <rect x="74" y="228" width="377" height="352" rx="18" fill="#ffffff" stroke="#2f5f9e" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="263" y="276" text-anchor="middle" class="card-title" fill="#1f3a8a">Owen Graphite</text>
+  <text x="263" y="311" text-anchor="middle" class="card-subtitle">Design System Layer</text>
+  <line x1="119" y1="341" x2="406" y2="341" stroke="#dbe8ee" stroke-width="2"/>
+  <text x="120" y="382" class="section">정의하는 것</text>
+  <text x="121" y="417" class="body">• 문서 구조와 정보 계층</text>
+  <text x="121" y="450" class="body">• 보고서/PDF 출력 안정성</text>
+  <text x="121" y="483" class="body">• Callout 의미 체계</text>
+  <text x="121" y="516" class="body">• Table utility class</text>
+
+  <line x1="452" y1="404" x2="514" y2="404" stroke="#475569" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="520" y="198" width="398" height="411" rx="24" fill="url(#center)" stroke="#d97745" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="719" y="246" text-anchor="middle" class="card-title" fill="#7c2d12">Merged AI Workflow</text>
+  <text x="719" y="281" text-anchor="middle" class="card-subtitle" fill="#7c2d12">LLM-wiki 문서 생성 기본값</text>
+
+  <rect x="570" y="326" width="300" height="52" rx="11" fill="#ffffff" stroke="#ead7b5" filter="url(#softShadow)"/>
+  <text x="720" y="358" text-anchor="middle" class="step">1. 목적과 독자 정의</text>
+  <rect x="570" y="396" width="300" height="52" rx="11" fill="#ffffff" stroke="#ead7b5" filter="url(#softShadow)"/>
+  <text x="720" y="428" text-anchor="middle" class="step">2. Graphite 구조 선택</text>
+  <rect x="570" y="466" width="300" height="52" rx="11" fill="#ffffff" stroke="#ead7b5" filter="url(#softShadow)"/>
+  <text x="720" y="498" text-anchor="middle" class="step">3. Editor 문법 적용</text>
+  <rect x="570" y="536" width="300" height="52" rx="11" fill="#ffffff" stroke="#ead7b5" filter="url(#softShadow)"/>
+  <text x="720" y="568" text-anchor="middle" class="step">4. 출력 품질 검증</text>
+
+  <line x1="988" y1="404" x2="926" y2="404" stroke="#475569" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <rect x="988" y="228" width="377" height="352" rx="18" fill="#ffffff" stroke="#28ad8b" stroke-width="1.3" filter="url(#shadow)"/>
+  <text x="1177" y="276" text-anchor="middle" class="card-title" fill="#087f5b">Owen Editor</text>
+  <text x="1177" y="311" text-anchor="middle" class="card-subtitle">Implementation Layer</text>
+  <line x1="1033" y1="341" x2="1320" y2="341" stroke="#daf4e6" stroke-width="2"/>
+  <text x="1034" y="382" class="section">구현하는 것</text>
+  <text x="1035" y="417" class="body">• 버튼 결과 Markdown/HTML</text>
+  <text x="1035" y="450" class="body">• Table Builder preset</text>
+  <text x="1035" y="483" class="body">• Metric/status/reference snippet</text>
+  <text x="1035" y="516" class="body">• Command ID와 변환 규칙</text>
+
+  <rect x="154" y="662" width="1132" height="68" rx="14" fill="#ffffff" stroke="#cbd5e1" filter="url(#softShadow)"/>
+  <text x="720" y="703" text-anchor="middle" class="principle">최종 원칙: Markdown-first, purpose-specific classes, summary-first judgement, source-backed actions.</text>
+  </svg>

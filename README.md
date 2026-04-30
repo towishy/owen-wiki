@@ -1,5 +1,7 @@
 ![Owen Markdown knowledge work stack](assets/repository-picks.svg)
 
+![Owen AI 문서 제작 병합 모델](assets/owen-ai-document-merged-model.svg)
+
 # Owen-WIKI Template Kit
 
 ![release](https://img.shields.io/badge/release-v1.12.1-0b84d8)
