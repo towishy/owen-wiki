@@ -5,6 +5,15 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.12.2] — 2026-05-02
+
+### README Hero Refresh
+
+- README 첫 번째 이미지를 Owen Knowledge Work Stack SVG로 교체
+- 새 이미지 자산 `assets/owen-knowledge-work-stack.svg` 추가
+
+---
+
 ## [1.12.1] — 2026-04-28
 
 ### README Presentation Polish

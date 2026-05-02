@@ -1,10 +1,10 @@
-![Owen Markdown knowledge work stack](assets/repository-picks.svg)
+![Owen Knowledge Work Stack](assets/owen-knowledge-work-stack.svg)
 
 ![Owen AI 문서 제작 병합 모델](assets/owen-ai-document-merged-model.svg)
 
 # Owen-WIKI Template Kit
 
-![release](https://img.shields.io/badge/release-v1.12.1-0b84d8)
+![release](https://img.shields.io/badge/release-v1.12.2-0b84d8)
 ![license](https://img.shields.io/badge/license-MIT-8cc84b)
 ![LLM Wiki](https://img.shields.io/badge/LLM%20Wiki-Template-6d4df2)
 ![Ontology](https://img.shields.io/badge/Knowledge%20Graph-Ontology-0f9d92)
@@ -15,7 +15,7 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.12.1 (2026-04-28)
+**Version**: 1.12.2 (2026-05-02)
 
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 663 페이지 / 6,317 위키링크 / raw 5,907 파일 / **Microsoft Security 27/27 제품 커버리지** 운영 경험 기반
 

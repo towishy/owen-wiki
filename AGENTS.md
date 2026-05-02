@@ -682,5 +682,5 @@ Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위�
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/work/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.12.1** (2026-04-28) — README presentation polish (status badges) 반영
+- 현재 버전: **v1.12.2** (2026-05-02) — README hero refresh (knowledge work stack image) 반영
 - 경로 동기화**: 템플릿 변경 시 외부 `D:\JAELE\owen-wiki\` (Win) / `/Users/owen/work/owen-wiki/` (macOS) 갱신한다
