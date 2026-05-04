@@ -10,6 +10,8 @@
 ![Ontology](https://img.shields.io/badge/Knowledge%20Graph-Ontology-0f9d92)
 ![Quality Gates](https://img.shields.io/badge/Quality%20Gates-Enabled-334155)
 
+![Owen-WIKI Template Kit](assets/owen-wiki-template-kit-sample.svg)
+
 Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산출물로 정리할 수 있도록 만든 Markdown 기반 지식 운영 템플릿이다. Owen Graphite, Owen Editor와 함께 수집부터 보고서 작성까지 이어지는 Obsidian 중심 작업 흐름의 핵심 스택을 구성한다.
 
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
