@@ -14,7 +14,7 @@ from datetime import date
 
 ROOT = Path(__file__).parent.parent
 WIKI = ROOT / 'wiki'
-OUT = ROOT / 'outputs' / 'drafts' / 'large-hubs-split-plan.md'
+OUT = ROOT / 'outputs' / 'wiki-ops' / 'large-hubs-split-plan.md'
 
 THRESHOLD = 50_000
 for i, a in enumerate(sys.argv):

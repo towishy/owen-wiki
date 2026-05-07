@@ -10,8 +10,8 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-QUALITY_JSON = ROOT / 'outputs' / 'drafts' / 'ontology-relation-quality.json'
-OUT_MD = ROOT / 'outputs' / 'drafts' / 'ontology-relation-rewrite-plan.md'
+QUALITY_JSON = ROOT / 'outputs' / 'wiki-ops' / 'ontology-relation-quality.json'
+OUT_MD = ROOT / 'outputs' / 'wiki-ops' / 'ontology-relation-rewrite-plan.md'
 SAFE_RELATIONS = {'covers', 'aggregates', 'uses', 'implemented-by', 'synthesizes'}
 LINE_RE = re.compile(r'(\[\[[^\]]+\]\]\s*)\[related-to\](\s*\[\[[^\]]+\]\])')
 

@@ -1,6 +1,6 @@
 """Weekly gap analysis — orphans, broken links, stubs, decay, action queue, ops dashboard 종합 보고서.
 
-기존 스크립트 결과를 묶어 outputs/drafts/weekly-gaps-YYYY-MM-DD.md 생성.
+기존 스크립트 결과를 묶어 outputs/wiki-ops/weekly-gaps-YYYY-MM-DD.md 생성.
 
 사용:
   python scripts/weekly-gap-report.py
@@ -12,7 +12,7 @@ from datetime import date
 
 ROOT = Path(__file__).parent.parent
 SCRIPTS = ROOT / 'scripts'
-OUT_DIR = ROOT / 'outputs' / 'drafts'
+OUT_DIR = ROOT / 'outputs' / 'wiki-ops'
 TODAY = date.today().isoformat()
 OUT_PATH = OUT_DIR / f'weekly-gaps-{TODAY}.md'
 

@@ -1,21 +1,15 @@
-# Sync wiki/ changes to an external Obsidian vault folder (incremental).
+# Sync wiki/ changes to raw/obsidian/outputs/reports/ (incremental)
 #
-# 위키 페이지 변경분만 외부 Obsidian 볼트(예: 백업/공유용)로 증분 복사.
-# wiki/ 변경 시 자동 동기 hook으로 사용 가능.
+# user memory: "wiki/ 하위에 md 문서 생성/업데이트 시 raw/obsidian/outputs/reports/에도 동일 파일 복사본 생성"
 #
 # Usage:
-#   pwsh scripts/sync-to-obsidian.ps1 -Destination "D:\Obsidian\WikiMirror"
-#   pwsh scripts/sync-to-obsidian.ps1 -Destination "/Users/me/Obsidian/wiki" -All
-#   pwsh scripts/sync-to-obsidian.ps1 -Destination $env:OBSIDIAN_MIRROR -Hours 72 -DryRun
-#
-# Destination을 매번 지정하기 싫으면 환경변수로 설정:
-#   $env:OBSIDIAN_MIRROR = "D:\Obsidian\WikiMirror"   # 또는 셸 프로파일에 영구 등록
-#
-# 양 OS 호환: PowerShell Core 7+ (pwsh)
+#   pwsh scripts/sync-to-obsidian.ps1               # last 24h changed files
+#   pwsh scripts/sync-to-obsidian.ps1 -All          # full sync
+#   pwsh scripts/sync-to-obsidian.ps1 -Hours 72     # custom window
+#   pwsh scripts/sync-to-obsidian.ps1 -DryRun       # report only
 
 [CmdletBinding()]
 param(
-  [string]$Destination = $env:OBSIDIAN_MIRROR,
   [switch]$All,
   [int]$Hours = 24,
   [switch]$DryRun
@@ -24,37 +18,31 @@ param(
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $src = Join-Path $repoRoot 'wiki'
-
-if ([string]::IsNullOrWhiteSpace($Destination)) {
-  Write-Error "Destination not set. Pass -Destination <path> or set `$env:OBSIDIAN_MIRROR."
-  exit 1
-}
+$dst = Join-Path $repoRoot 'raw\obsidian\outputs\reports'
 
 if (-not (Test-Path $src)) { Write-Error "wiki/ not found: $src"; exit 1 }
-if (-not (Test-Path $Destination)) {
+if (-not (Test-Path $dst)) {
   if ($DryRun) {
-    Write-Host "[DRY-RUN] Would create: $Destination"
+    Write-Host "[DRY-RUN] Would create: $dst"
   } else {
-    New-Item -ItemType Directory -Path $Destination -Force | Out-Null
+    New-Item -ItemType Directory -Path $dst -Force | Out-Null
   }
 }
 
 $cutoff = (Get-Date).AddHours(-$Hours)
 $files = Get-ChildItem $src -Recurse -File -Filter *.md | Where-Object {
   $_.Name -notin @('_index.md', 'README.md') -and
-  $_.FullName -notmatch '[\\/]ontology[\\/]' -and
+  $_.FullName -notmatch '\\ontology\\' -and
   ($All.IsPresent -or $_.LastWriteTime -ge $cutoff)
 }
 
-Write-Host "Source: $src"
-Write-Host "Destination: $Destination"
 Write-Host "Files to sync: $($files.Count) (mode: $(if($All){'ALL'}else{"last $Hours h"}))"
 
 $copied = 0
 $skipped = 0
 foreach ($f in $files) {
   $rel = $f.FullName.Substring($src.Length).TrimStart('\','/')
-  $target = Join-Path $Destination $rel
+  $target = Join-Path $dst $rel
   $targetDir = Split-Path $target -Parent
   if ($DryRun) {
     Write-Host "  [DRY] $rel"

@@ -18,7 +18,7 @@ CANONICAL_RELATIONS = {
     'triggers', 'enables', 'requires', 'supports', 'deploys',
     'feeds', 'receives-signal-from', 'uses-signal', 'audited-via',
     # 확장 — 콘텐츠
-    'covers', 'documents', 'teaches', 'solves', 'synthesizes',
+    'covers', 'documents', 'teaches', 'solves', 'synthesizes', 'references',
     # v2 추가 (실사용 기반, 2026-04-24)
     'complements', 'created-by', 'demonstrates', 'describes', 'developed-by',
     'enforced-via', 'evaluated-with', 'evaluates', 'extended-by', 'hosted-on',

@@ -13,16 +13,17 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
+from wiki_utils import extract_wikilink_targets
+
 ROOT = Path(__file__).parent.parent
 WIKI_ROOT = ROOT / 'wiki'
 OUTPUTS_ROOT = ROOT / 'outputs'
-OUT_MD = OUTPUTS_ROOT / 'drafts' / 'wiki-action-queue.md'
-OUT_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-action-queue.json'
+OUT_MD = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-action-queue.md'
+OUT_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-action-queue.json'
 TAG_ALIASES = ROOT / 'scripts' / 'tag-aliases.yml'
 GRAPH_JSON = ROOT / 'graphify-out' / 'graph.json'
 
 FM_RE = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
-WIKILINK_RE = re.compile(r'\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]')
 RAW_REF_RE = re.compile(r'raw/[^`<>\n]+')
 PRODUCT_KEYWORDS = {
     'mde': 'prod/mde',
@@ -123,7 +124,7 @@ def load_pages():
             'sources': sources,
             'source_count': len(sources),
             'raw_refs': raw_refs,
-            'links': set(WIKILINK_RE.findall(body)),
+            'links': set(extract_wikilink_targets(body)),
             'body_len': len(body.strip()),
             'is_registry': 'type/source-registry' in tags or slug(path).startswith('remaining-raw-'),
         })
@@ -272,7 +273,7 @@ def load_output_linked_pages():
             content = path.read_text(encoding='utf-8', errors='replace')
         except Exception:
             continue
-        linked.update(WIKILINK_RE.findall(content))
+        linked.update(extract_wikilink_targets(content))
     return linked
 
 

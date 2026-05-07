@@ -60,6 +60,26 @@ def check_remaining_registry_parent_links():
     return pass_gate('remaining raw registry parent hub links')
 
 
+def check_script_success(name, *args):
+    code, output = run_script(name) if not args else run_script_with_args(name, *args)
+    if code != 0:
+        return fail(f'{name} exited with {code}', output)
+    return pass_gate(f'{name} passed')
+
+
+def run_script_with_args(name, *args):
+    result = subprocess.run(
+        [sys.executable, str(SCRIPTS / name), *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='replace',
+        timeout=120,
+    )
+    return result.returncode, result.stdout + result.stderr
+
+
 def main():
     gates = [
         check_output('scan-broken-links.py', r'Truly broken:\s+(\d+) occurrences'),
@@ -67,6 +87,8 @@ def main():
         check_output('check-tags.py', r'Tag prefix compliance:\s+\d+ OK,\s+(\d+) non-compliant'),
         check_output('identify-stubs.py', r'Stubs found:\s+(\d+)\s+/'),
         check_remaining_registry_parent_links(),
+        check_script_success('check-graph-hygiene.py'),
+        check_script_success('check-related-to-budget.py', '--refresh'),
     ]
     if not all(gates):
         sys.exit(1)

@@ -1,6 +1,6 @@
 """Build raw→wiki reverse map: which wiki page references each raw file.
 
-Output: outputs/drafts/raw-to-wiki-map.json + summary report.
+Output: outputs/wiki-ops/raw-to-wiki-map.json + summary report.
 
 각 wiki 페이지의 sources YAML + 본문의 raw/ 경로 참조를 수집하여 반대 방향 인덱스 구축.
 갭 분석에서 "어떤 raw가 아직 활용되지 않았는가" 식별에 사용.
@@ -14,8 +14,8 @@ from datetime import date
 
 ROOT = Path(__file__).parent.parent
 WIKI_ROOT = ROOT / 'wiki'
-OUT_JSON = ROOT / 'outputs' / 'drafts' / 'raw-to-wiki-map.json'
-OUT_REPORT = ROOT / 'outputs' / 'drafts' / 'raw-to-wiki-map.md'
+OUT_JSON = ROOT / 'outputs' / 'wiki-ops' / 'raw-to-wiki-map.json'
+OUT_REPORT = ROOT / 'outputs' / 'wiki-ops' / 'raw-to-wiki-map.md'
 
 FM_RE = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
 RAW_REF_RE = re.compile(r'(raw/[\w\-./ \u00a0가-힣]+?\.(?:md|pdf|pptx|docx|xlsx|csv))', re.IGNORECASE)

@@ -7,8 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 ONTOLOGY_ROOT = ROOT / 'wiki' / 'ontology'
 WIKI_ROOT = ROOT / 'wiki'
-OUT_JSONL = ROOT / 'outputs' / 'drafts' / 'ontology-sidecar.jsonl'
-OUT_MD = ROOT / 'outputs' / 'drafts' / 'ontology-sidecar.md'
+OUT_JSONL = ROOT / 'outputs' / 'wiki-ops' / 'ontology-sidecar.jsonl'
+OUT_MD = ROOT / 'outputs' / 'wiki-ops' / 'ontology-sidecar.md'
 
 REL_RE = re.compile(r'\[\[([^\]]+)\]\]\s+\[([^\]]+)\]\s+\[\[([^\]]+)\]\]')
 FM_RE = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
@@ -26,6 +26,7 @@ RELATION_WEIGHTS = {
     'competes-with': 0.75,
     'part-of': 0.75,
     'aggregates': 0.70,
+    'references': 0.65,
     'related-to': 0.50,
 }
 
@@ -66,13 +67,30 @@ def relation_weight(relation, source_meta, target_meta):
     return round(base, 3)
 
 
+def evidence_tier(source_meta, target_meta):
+    confidence_values = [v for v in (source_meta.get('confidence'), target_meta.get('confidence')) if isinstance(v, float)]
+    if not confidence_values:
+        return 'unknown'
+    average = sum(confidence_values) / len(confidence_values)
+    if average >= 0.85:
+        return 'high'
+    if average >= 0.70:
+        return 'medium'
+    if average >= 0.55:
+        return 'low'
+    return 'draft'
+
+
 def main():
     pages = page_index()
     records = []
     for path in sorted(ONTOLOGY_ROOT.glob('*.md')):
         text = path.read_text(encoding='utf-8', errors='replace')
         for line_no, line in enumerate(text.splitlines(), 1):
-            match = REL_RE.search(line)
+            stripped = line.strip()
+            if not stripped.startswith('[['):
+                continue
+            match = REL_RE.search(stripped)
             if not match:
                 continue
             source, relation, target = match.groups()
@@ -80,26 +98,35 @@ def main():
             target_slug = target.split('|', 1)[0].split('#', 1)[0]
             source_meta = pages.get(source_slug, {})
             target_meta = pages.get(target_slug, {})
+            strength = RELATION_WEIGHTS.get(relation, 0.60)
+            confidence = relation_weight(relation, source_meta, target_meta)
             records.append({
                 'source': source_slug,
                 'relation': relation,
                 'target': target_slug,
-                'weight': relation_weight(relation, source_meta, target_meta),
+                'weight': confidence,
+                'relation_strength': strength,
+                'relation_confidence': confidence,
+                'evidence_tier': evidence_tier(source_meta, target_meta),
+                'source_confidence': source_meta.get('confidence'),
+                'target_confidence': target_meta.get('confidence'),
                 'source_category': source_meta.get('category'),
                 'target_category': target_meta.get('category'),
                 'source_path': source_meta.get('path'),
                 'target_path': target_meta.get('path'),
                 'ontology_file': path.relative_to(ROOT).as_posix(),
                 'ontology_line': line_no,
-                'evidence': line.strip(),
+                'evidence': stripped,
             })
 
     OUT_JSONL.parent.mkdir(parents=True, exist_ok=True)
     OUT_JSONL.write_text('\n'.join(json.dumps(record, ensure_ascii=False) for record in records) + '\n', encoding='utf-8')
 
     by_relation = {}
+    by_tier = {}
     for record in records:
         by_relation[record['relation']] = by_relation.get(record['relation'], 0) + 1
+        by_tier[record['evidence_tier']] = by_tier.get(record['evidence_tier'], 0) + 1
     today = date.today().isoformat()
     lines = [
         '---', 'title: "Ontology Sidecar Report"', 'type: report', f'updated: {today}', f'count: {len(records)}', '---', '',
@@ -110,6 +137,9 @@ def main():
     ]
     for relation, count in sorted(by_relation.items(), key=lambda item: (-item[1], item[0])):
         lines.append(f'| `{relation}` | {count} |')
+    lines += ['', '## Evidence Tiers', '', '| Tier | Count |', '|---|---:|']
+    for tier, count in sorted(by_tier.items(), key=lambda item: (-item[1], item[0])):
+        lines.append(f'| `{tier}` | {count} |')
     lines += ['', '## Top Weighted Relations', '', '| Source | Relation | Target | Weight |', '|---|---|---|---:|']
     for record in sorted(records, key=lambda item: -item['weight'])[:30]:
         lines.append(f"| [[{record['source']}]] | `{record['relation']}` | [[{record['target']}]] | {record['weight']:.3f} |")

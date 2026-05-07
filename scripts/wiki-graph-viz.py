@@ -20,9 +20,10 @@ import networkx as nx
 from community import community_louvain  # python-louvain
 from pyvis.network import Network
 
+from wiki_utils import RAW_WIKILINK_RE, normalize_wikilink_target
+
 # ── 설정 ──────────────────────────────────────────────
 
-WIKILINK_RE = re.compile(r"\[\[([^\]\|#]+)(?:[#\|][^\]]*)?\]\]")
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 YAML_FIELD_RE = re.compile(r"^(\w[\w_-]*):\s*(.+)$", re.MULTILINE)
 
@@ -65,7 +66,7 @@ def extract_wikilinks(text: str) -> list[str]:
     cleaned = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     # YAML 프론트매터 제거
     cleaned = re.sub(r"^---\s*\n.*?\n---", "", cleaned, flags=re.DOTALL)
-    return WIKILINK_RE.findall(cleaned)
+    return [normalize_wikilink_target(match.group(1)) for match in RAW_WIKILINK_RE.finditer(cleaned)]
 
 
 def detect_category(filepath: Path, wiki_dir: Path) -> str:

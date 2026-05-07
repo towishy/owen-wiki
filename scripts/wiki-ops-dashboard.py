@@ -10,17 +10,21 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 SCRIPTS = ROOT / 'scripts'
 OUTPUTS_ROOT = ROOT / 'outputs'
-OUT_MD = OUTPUTS_ROOT / 'drafts' / 'wiki-ops-dashboard.md'
-OUT_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-ops-dashboard.json'
-ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-action-queue.json'
-LIFECYCLE_JSON = OUTPUTS_ROOT / 'drafts' / 'registry-promotion-lifecycle.json'
-ONTOLOGY_JSONL = OUTPUTS_ROOT / 'drafts' / 'ontology-sidecar.jsonl'
-RELATION_QUALITY_JSON = OUTPUTS_ROOT / 'drafts' / 'ontology-relation-quality.json'
+OUT_MD = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-ops-dashboard.md'
+OUT_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-ops-dashboard.json'
+ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-action-queue.json'
+LIFECYCLE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'registry-promotion-lifecycle.json'
+ONTOLOGY_JSONL = OUTPUTS_ROOT / 'wiki-ops' / 'ontology-sidecar.jsonl'
+RELATION_QUALITY_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'ontology-relation-quality.json'
+REPO_METRICS_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'repo-metrics.json'
+GRAPH_HYGIENE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'graph-hygiene.json'
+GRAPH_DELTA_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'graph-delta.json'
+REGISTRY_WORKBENCH_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'registry-promotion-workbench.json'
 
 
-def run_script(name):
+def run_script(name, *args):
     result = subprocess.run(
-        [sys.executable, str(SCRIPTS / name)],
+        [sys.executable, str(SCRIPTS / name), *args],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -70,16 +74,24 @@ def ontology_counts():
 
 def build_payload():
     previous = load_json(OUT_JSON, {})
+    run_script('wiki-stats.py', '--write-ops')
     run_script('build-ontology-sidecar.py')
     run_script('wiki-action-queue.py')
     run_script('registry-promotion-lifecycle.py')
     run_script('check-ontology-relations.py')
+    run_script('check-graph-hygiene.py')
+    run_script('graph-delta-report.py')
+    run_script('registry-promotion-workbench.py')
     gate_code, gate_output = run_script('wiki-quality-gates.py')
     action_queue = load_json(ACTION_QUEUE_JSON, {})
     lifecycle = load_json(LIFECYCLE_JSON, {'items': [], 'status_counts': {}})
     relation_quality = load_json(RELATION_QUALITY_JSON, {})
+    graph_hygiene = load_json(GRAPH_HYGIENE_JSON, {})
+    graph_delta = load_json(GRAPH_DELTA_JSON, {})
+    registry_workbench = load_json(REGISTRY_WORKBENCH_JSON, {})
     payload = {
         'updated': date.today().isoformat(),
+        'repo_metrics': load_json(REPO_METRICS_JSON, {}),
         'quality_gates': parse_quality_gates(gate_output) | {'exit_code': gate_code},
         'action_queue': {
             'registry_promotion_candidates': len(action_queue.get('registry_promotion_candidates', [])),
@@ -95,6 +107,12 @@ def build_payload():
         },
         'ontology': ontology_counts(),
         'relation_quality': relation_quality,
+        'graph_hygiene': graph_hygiene,
+        'graph_delta': graph_delta,
+        'registry_workbench': {
+            'packets': len(registry_workbench.get('packets', [])),
+            'top_packets': registry_workbench.get('packets', [])[:5],
+        },
     }
     payload['delta'] = compute_delta(previous, payload)
     return payload
@@ -129,11 +147,15 @@ def nested_get(data, path):
 
 
 def render(payload):
+    repo_metrics = payload.get('repo_metrics', {})
     quality = payload['quality_gates']
     action = payload['action_queue']
     lifecycle = payload['lifecycle']
     ontology = payload['ontology']
     relation_quality = payload.get('relation_quality', {})
+    graph_hygiene = payload.get('graph_hygiene', {})
+    graph_delta = payload.get('graph_delta', {})
+    registry_workbench = payload.get('registry_workbench', {})
     delta = payload.get('delta', {})
     today = payload['updated']
     status = 'PASS' if quality.get('passed') and quality.get('exit_code') == 0 else 'CHECK'
@@ -148,6 +170,20 @@ def render(payload):
         '',
         f'**Overall status:** `{status}`',
         '',
+        '## Canonical Repository Metrics',
+        '',
+        '- Source: `outputs/wiki-ops/repo-metrics.json`',
+        '',
+        '| Metric | Value |',
+        '|---|---:|',
+        f"| Wiki pages | {nested_get(repo_metrics, ('pages', 'total')) or 0} |",
+        f"| Wikilinks | {nested_get(repo_metrics, ('content', 'wikilinks')) or 0} |",
+        f"| Total lines | {nested_get(repo_metrics, ('content', 'total_lines')) or 0} |",
+        f"| Total words | {nested_get(repo_metrics, ('content', 'total_words')) or 0} |",
+        f"| Unique tags | {nested_get(repo_metrics, ('tags', 'unique')) or 0} |",
+        f"| Raw source files | {nested_get(repo_metrics, ('raw_sources', 'files')) or 0} |",
+        f"| Git commits | {nested_get(repo_metrics, ('git', 'commits')) or 0} |",
+        '',
         '## Quality Gates',
         '',
         '| Gate | Value |',
@@ -156,6 +192,7 @@ def render(payload):
         f"| Orphan pages | {quality.get('orphans')} |",
         f"| Tag violations | {quality.get('tag_violations')} |",
         f"| Stub pages | {quality.get('stubs')} |",
+        f"| Graph hygiene issues | {graph_hygiene.get('issue_count', 0)} |",
         '',
         '## Action Queue',
         '',
@@ -212,7 +249,7 @@ def render(payload):
         '## Ontology Sidecar',
         '',
         f"- Relations: `{ontology.get('relations', 0)}`",
-        '- Sidecar: `outputs/drafts/ontology-sidecar.jsonl`',
+        '- Sidecar: `outputs/wiki-ops/ontology-sidecar.jsonl`',
         '',
         '| Relation | Count |',
         '|---|---:|',
@@ -224,12 +261,23 @@ def render(payload):
         '## Ontology Relation Quality',
         '',
         f"- Weak `related-to` candidates: `{relation_quality.get('weak_related_to_count', 0)}`",
-        f"- Report: `outputs/drafts/ontology-relation-quality.md`",
+        f"- Report: `outputs/wiki-ops/ontology-relation-quality.md`",
+        '',
+        '## Graph Hygiene & Delta',
+        '',
+        f"- Hygiene issues: `{graph_hygiene.get('issue_count', 0)}`",
+        f"- Escaped aliases normalized: `{graph_hygiene.get('escaped_aliases', 0)}`",
+        f"- Graph delta: nodes `{nested_get(graph_delta, ('delta', 'nodes')) or 0:+d}`, edges `{nested_get(graph_delta, ('delta', 'edges')) or 0:+d}`",
+        '',
+        '## Registry Promotion Workbench',
+        '',
+        f"- Review packets: `{registry_workbench.get('packets', 0)}`",
+        f"- Report: `outputs/wiki-ops/registry-promotion-workbench.md`",
         '',
         '',
         '## Next Operating Moves',
         '',
-        '1. Review `outputs/drafts/registry-promotion-lifecycle.md` and mark Top 5 candidates as `sampled` or `deferred`.',
+        '1. Review `outputs/wiki-ops/registry-promotion-lifecycle.md` and mark Top 5 candidates as `sampled` or `deferred`.',
         '2. Promote one high-value registry candidate to curated summary before adding more source registry pages.',
         '3. Use curated summary/entity/concept/synthesis first in query answers; use registry pages as coverage evidence only.',
         '',

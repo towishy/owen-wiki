@@ -6,9 +6,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 OUTPUTS_ROOT = ROOT / 'outputs'
-ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'drafts' / 'wiki-action-queue.json'
-STATE_JSON = OUTPUTS_ROOT / 'drafts' / 'registry-promotion-lifecycle.json'
-OUT_MD = OUTPUTS_ROOT / 'drafts' / 'registry-promotion-lifecycle.md'
+ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-action-queue.json'
+STATE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'registry-promotion-lifecycle.json'
+OUT_MD = OUTPUTS_ROOT / 'wiki-ops' / 'registry-promotion-lifecycle.md'
 
 DEFAULT_STATUS = 'candidate'
 STATUS_ORDER = ['candidate', 'sampled', 'promoted', 'deferred', 'rejected']

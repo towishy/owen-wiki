@@ -31,6 +31,10 @@ def normalize_text(value: str) -> str:
     return unicodedata.normalize("NFC", value)
 
 
+def source_path(path: str) -> str:
+    return normalize_text(path.replace("\\", "/"))
+
+
 def slugify(value: str, max_len: int = 90) -> str:
     value = normalize_text(value).lower()
     value = re.sub(r"[^0-9a-z가-힣]+", "-", value).strip("-")
@@ -43,7 +47,7 @@ def parse_report(path: Path) -> list[str]:
     candidates: list[str] = []
     row_re = re.compile(r"^\|\s*\d+\s*\|\s*-?\d+\s*\|\s*[^|]+\|\s*`(raw/[^`]+)`", re.M)
     for match in row_re.finditer(text):
-        candidates.append(normalize_text(match.group(1).replace(r"\|", "|")))
+        candidates.append(source_path(match.group(1).replace(r"\|", "|")))
     return sorted(set(candidates))
 
 

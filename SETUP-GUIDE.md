@@ -36,7 +36,7 @@
 # 프로젝트 루트에서 실행
 PROJECT_ROOT="my-wiki"  # ← 원하는 이름으로 변경
 
-mkdir -p "$PROJECT_ROOT"/{raw/{assets,articles,papers,notes,extracted},wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},outputs/{presentations,reports,workshops,drafts},scripts,templates}
+mkdir -p "$PROJECT_ROOT"/{raw/{assets,articles,papers,notes,extracted},wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},outputs/{presentations,reports,workshops,drafts,wiki-ops},scripts,templates,.github/workflows}
 
 cd "$PROJECT_ROOT"
 ```
@@ -59,7 +59,9 @@ my-wiki/
 │   ├── synthesis/
 │   └── ontology/          ← 관계 그래프
 ├── outputs/               ← 최종 산출물
+│   └── wiki-ops/          ← 운영 대시보드·품질 리포트·metrics JSON
 ├── scripts/
+├── .github/workflows/     ← CI quality gates
 └── templates/
 ```
 
@@ -83,8 +85,11 @@ cp <kit-path>/ontology-templates/*.md ./wiki/ontology/
 # 페이지 템플릿
 cp <kit-path>/templates/*.md ./templates/
 
-# 스크립트 (추출 + 린트 유틸리티)
-cp <kit-path>/scripts/*.py ./scripts/
+# 스크립트 (추출 + 린트 + 운영 자동화 유틸리티)
+cp <kit-path>/scripts/* ./scripts/
+
+# GitHub Actions CI
+cp <kit-path>/.github/workflows/wiki-lint.yml ./.github/workflows/wiki-lint.yml
 ```
 
 ---
@@ -191,9 +196,18 @@ Obsidian에서 Graph View를 열면 첫 번째 페이지 네트워크가 보인�
 - Comparison 페이지 활성화
 
 ### 소스 200개 이상 (확장기)
+- `scripts/wiki-ops-dashboard.py`로 `outputs/wiki-ops/` 운영 대시보드 생성
+- `scripts/wiki-action-queue.py`와 `scripts/registry-promotion-workbench.py`로 registry 승격 후보 검토
+- `scripts/wiki-query.py`로 질의 후보를 query-adjusted ranking으로 라우팅
 - qmd 등 검색 엔진 도입 고려
 - 온톨로지 클러스터가 안정화
 - outputs/ 산출물 생산 본격화
+
+### 소스 500개 이상 (운영기)
+- `scripts/update-metrics-snippets.py`로 README/AGENTS metrics drift 방지
+- `scripts/check-graph-hygiene.py`와 `scripts/check-related-to-budget.py`를 CI guard로 유지
+- `scripts/graph-delta-report.py`로 릴리즈 간 그래프 변화 확인
+- `scripts/release-wiki.py`로 validation → tag → GitHub Release 흐름 자동화
 
 ---
 

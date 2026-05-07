@@ -5,7 +5,7 @@
   - sources 0개 + 본문 < 800자
   - 헤딩(##) 1개 이하 + 본문 < 500자
 
-출력: outputs/drafts/stub-pages-report.md (수동 보강 큐)
+출력: outputs/wiki-ops/stub-pages-report.md (수동 보강 큐)
 
 사용:
   python scripts/identify-stubs.py            # 보고만
@@ -18,7 +18,7 @@ from pathlib import Path
 from datetime import date
 
 WIKI_ROOT = Path(__file__).parent.parent / 'wiki'
-OUT_PATH = Path(__file__).parent.parent / 'outputs' / 'drafts' / 'stub-pages-report.md'
+OUT_PATH = Path(__file__).parent.parent / 'outputs' / 'wiki-ops' / 'stub-pages-report.md'
 APPLY = '--tag' in sys.argv
 
 FM_RE = re.compile(r'^---\n(.*?)\n---\n(.*)$', re.DOTALL)
@@ -29,10 +29,12 @@ def parse_fm(content):
     if not m:
         return {}, content
     fm = {}
-    for line in m.group(1).splitlines():
+    fm_text = m.group(1)
+    for line in fm_text.splitlines():
         m2 = re.match(r'^([a-zA-Z_]+):\s*(.*)$', line)
         if m2:
             fm[m2.group(1)] = m2.group(2).strip()
+    fm['_raw'] = fm_text
     return fm, m.group(2)
 
 
@@ -43,8 +45,14 @@ def is_stub(fm, body):
     sources_line = fm.get('sources', '')
     n_src_approx = sources_line.count(',') + 1 if sources_line and sources_line != '[]' else 0
     if 'sources' in fm and fm.get('sources') == '':
-        # multiline sources, count from full content
-        pass
+        raw_fm = fm.get('_raw', '')
+        after_sources = raw_fm.split('sources:', 1)[1]
+        block = []
+        for line in after_sources.splitlines()[1:]:
+            if re.match(r'^[a-zA-Z_]+:\s*', line):
+                break
+            block.append(line)
+        n_src_approx = sum(1 for line in block if re.match(r'^\s*-\s+', line))
     if n_chars < 200:
         return True, 'very-short'
     if n_src_approx == 0 and n_chars < 800:

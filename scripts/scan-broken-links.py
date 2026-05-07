@@ -12,7 +12,7 @@ truly_missing = set()
 link_pat = re.compile(r'\[\[([^\[\]]+?)\]\]')
 code_block_pat = re.compile(r'```.*?```', re.DOTALL)
 frontmatter_pat = re.compile(r'\A---.*?---', re.DOTALL)
-meta_refs = {'위키링크', 'Source', 'Target', 'page-name', 'PageName', '페이지명', '페이지1', '페이지2'}
+meta_refs = {'위키링크', 'Source', 'Target', 'page-name', 'PageName', '페이지명', '페이지1', '페이지2', '_index'}
 
 for root, dirs, files in os.walk('wiki'):
     for f in files:
@@ -34,6 +34,6 @@ for root, dirs, files in os.walk('wiki'):
                 broken.append((f, target))
                 truly_missing.add(target)
 
-print(f'Broken links: {len(broken)} occurrences, {len(truly_missing)} unique missing targets')
+print(f'Truly broken: {len(broken)} occurrences, {len(truly_missing)} unique missing targets')
 for t in sorted(truly_missing):
     print(f'  - {t}')

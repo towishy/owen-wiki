@@ -5,6 +5,47 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.15.0] — 2026-05-07
+
+### Operational Automation + Architecture Parity
+
+Owen의 LLM-Wiki `v1.15.0` 운영 기능을 템플릿 킷에 반영해, 템플릿도 현재 저장소와 같은 query routing, graph hygiene, metrics, release automation 루프를 제공한다.
+
+**AGENTS.md 변경:**
+- 현재 규모 갱신: 669 pages / 6,487 wikilinks / 665 ontology relations / graph 674 nodes, 3,645 edges
+- `### Ontology Relation Refinement (v1.13+)` 추가
+- `### Architecture Hardening (v1.14+)` 추가
+- `### Operational Automation (v1.15+)` 추가
+- 운영 산출물 기본 경로를 `outputs/wiki-ops/` 기준으로 정리
+
+**README 변경:**
+- 릴리즈 배지와 버전 표기를 `v1.15.0`으로 갱신
+- 핵심 특징을 12개로 확장하고 v1.13~v1.15 기능을 추가
+- 스크립트 카탈로그를 46종 기준으로 갱신
+- Quick Start에 `outputs/wiki-ops/`와 GitHub Actions workflow 복사 절차 추가
+
+**스크립트 추가:**
+- `wiki_utils.py` — 공통 wikilink/frontmatter/token parser, escaped alias 정규화
+- `wiki-query.py` — query-adjusted ranking 기반 후보 페이지 라우터
+- `check-graph-hygiene.py` — graph node 오염 탐지
+- `check-related-to-budget.py` — weak `related-to` 예산 guard
+- `update-metrics-snippets.py` — README/AGENTS metrics block 자동 갱신
+- `graph-delta-report.py` — 릴리즈 간 graph delta 리포트
+- `registry-promotion-workbench.py` — registry 후보 review packet 생성
+- `release-wiki.py` — validation/commit/tag/release 자동화
+
+**스크립트 강화:**
+- `build-ontology-sidecar.py` — relation confidence, evidence tier, source/target confidence 필드 추가
+- `wiki-graph-viz.py`, `wiki-action-queue.py` — 공통 wikilink normalization 사용
+- `wiki-ops-dashboard.py` — canonical metrics, graph hygiene, graph delta, registry workbench 요약 추가
+- `wiki-quality-gates.py` — graph hygiene와 related-to budget gate 포함
+- `compute-pagerank.py` — query-adjusted rank 지원
+- `.github/workflows/wiki-lint.yml` — strict CI와 `outputs/wiki-ops/` artifact 업로드 반영
+
+**설정 가이드 변경:**
+- 새 프로젝트 생성 시 `outputs/wiki-ops/`와 `.github/workflows/`를 기본 생성
+- 200+ / 500+ 소스 규모별 운영 자동화 루프 추가
+
 ## [1.12.2] — 2026-05-02
 
 ### README Hero Refresh

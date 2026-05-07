@@ -8,9 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
 WIKI_ROOT = ROOT / 'wiki'
-ACTION_QUEUE_JSON = ROOT / 'outputs' / 'drafts' / 'wiki-action-queue.json'
-LIFECYCLE_JSON = ROOT / 'outputs' / 'drafts' / 'registry-promotion-lifecycle.json'
-OUT_DIR = ROOT / 'outputs' / 'drafts' / 'registry-samples'
+ACTION_QUEUE_JSON = ROOT / 'outputs' / 'wiki-ops' / 'wiki-action-queue.json'
+LIFECYCLE_JSON = ROOT / 'outputs' / 'wiki-ops' / 'registry-promotion-lifecycle.json'
+OUT_DIR = ROOT / 'outputs' / 'wiki-ops' / 'registry-samples'
 
 FM_RE = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
 PRODUCT_HINTS = ('sentinel', 'entra', 'intune', 'mde', 'defender', 'purview', 'copilot', 'xdr', 'mdc')

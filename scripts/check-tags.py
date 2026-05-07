@@ -18,6 +18,7 @@ for root, dirs, files in os.walk('wiki'):
         m = re.match(r'^---\s*\n(.*?)\n---', content, re.DOTALL)
         if not m:
             continue
+        # Extract tags line
         fm_text = m.group(1)
         tags_match = re.search(r'tags:\s*\[([^\]]*)\]', fm_text)
         if not tags_match:

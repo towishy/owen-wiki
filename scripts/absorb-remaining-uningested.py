@@ -23,6 +23,9 @@ ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
 os.environ["PYTHONIOENCODING"] = "utf-8"
 
+def source_path(path: str) -> str:
+    return path.replace("\\", "/")
+
 # Run scanner
 print("[1/3] Scanning uningested...")
 res = subprocess.run(
@@ -30,7 +33,7 @@ res = subprocess.run(
     capture_output=True, text=True, encoding="utf-8",
 )
 row_re = re.compile(r"^\|\s*\d+\s*\|\s*-?\d+\s*\|\s*\S+\s*\|\s*`(raw/[^`]+)`")
-candidates = [m.group(1) for line in res.stdout.splitlines() if (m := row_re.match(line))]
+candidates = [source_path(m.group(1)) for line in res.stdout.splitlines() if (m := row_re.match(line))]
 print(f"  parsed {len(candidates)} candidates")
 
 # Routing rules — order matters (first match wins)
@@ -130,8 +133,8 @@ for hub_fname, new_paths in routes_count.items():
     if not m:
         print(f"  SKIP (no sources block): {hub_fname}")
         continue
-    existing = set(re.findall(r'- "(raw/[^"]+)"', m.group(1)))
-    merged = sorted(existing | set(new_paths))
+    existing = {source_path(path) for path in re.findall(r'- "(raw/[^"]+)"', m.group(1))}
+    merged = sorted(existing | {source_path(path) for path in new_paths})
     added = len(merged) - len(existing)
     new_block = "sources:\n" + "\n".join(f'  - "{p}"' for p in merged) + "\n"
     new_text = text[: m.start()] + new_block + text[m.end():]

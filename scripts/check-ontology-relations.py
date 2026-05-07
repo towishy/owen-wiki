@@ -5,9 +5,9 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-SIDE_CAR = ROOT / 'outputs' / 'drafts' / 'ontology-sidecar.jsonl'
-OUT_MD = ROOT / 'outputs' / 'drafts' / 'ontology-relation-quality.md'
-OUT_JSON = ROOT / 'outputs' / 'drafts' / 'ontology-relation-quality.json'
+SIDE_CAR = ROOT / 'outputs' / 'wiki-ops' / 'ontology-sidecar.jsonl'
+OUT_MD = ROOT / 'outputs' / 'wiki-ops' / 'ontology-relation-quality.md'
+OUT_JSON = ROOT / 'outputs' / 'wiki-ops' / 'ontology-relation-quality.json'
 
 WEAK_RELATIONS = {'related-to'}
 SUGGESTIONS = {
