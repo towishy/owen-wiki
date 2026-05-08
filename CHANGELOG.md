@@ -5,6 +5,18 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.15.1] — 2026-05-08
+
+### Document Authoring Visual Policy
+
+Owen의 LLM-Wiki 문서 작성 정책 변경을 템플릿 킷에 반영했다.
+
+**AGENTS.md 변경:**
+- 다이어그램 기본값을 Mermaid 우선에서 SVG 우선으로 변경
+- Mermaid는 빠른 초안, 단순 흐름, SVG 제작 불가, 사용자 명시 요청 시 fallback으로 제한
+- SVG 디자인 원칙 추가: Liquid Glass + Shadow, safe margin, internal padding, text-fit, caption/source note
+- A3 PDF 가로폭 기준을 SVG와 Mermaid fallback 기준으로 분리
+
 ## [1.15.0] — 2026-05-07
 
 ### Operational Automation + Architecture Parity

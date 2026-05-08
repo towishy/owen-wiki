@@ -381,18 +381,38 @@ count: N
 - **PPTX 프레젠테이션**: `python-pptx` 또는 `pptxgenjs`로 네이티브 PowerPoint 생성 (`outputs/presentations/`)
 - **DOCX 보고서**: `docx-js`로 Word 문서 생성 (`outputs/reports/`)
 - **XLSX 분석**: `openpyxl`/`pandas`로 스프레드시트 생성·분석
-- **차트/다이어그램**: Mermaid 다이어그램 또는 matplotlib 코드 블록으로 시각화
+- **차트/다이어그램**: SVG 이미지를 우선 생성하고, SVG를 사용할 수 없는 경우에만 Mermaid 또는 matplotlib 코드 블록으로 시각화
 - **Canvas**: Obsidian Canvas 형식으로 개념 맵 생성 가능
 
 ---
 
-## 다이어그램 표준 (Mermaid 우선)
+## 다이어그램 표준 (SVG 우선)
 
-모든 도식·인포그래픽은 **Mermaid**를 우선 사용한다. ASCII 박스 다이어그램은 금지 (Obsidian 네이티브 지원, 한글 전각/반각 정렬 문제 없음).
+모든 도식·인포그래픽은 **SVG 이미지**를 우선 사용한다. SVG를 사용할 수 없는 상황에서만 Mermaid를 fallback으로 사용한다. ASCII 박스 다이어그램은 금지한다.
+
+### SVG 디자인 원칙
+
+- 문서용 SVG는 **고급스럽게 정돈된 정보 구조**를 목표로 한다. 한 SVG의 핵심 메시지는 1개로 제한하고, 시선 흐름은 좌→우, 상→하, 중심→주변 중 하나로 통일한다.
+- Owen Graphite 톤에 맞춰 **Liquid Glass 디자인 + 그림자 효과**를 적극 적용한다. 반투명 glass surface, radial highlight, inset shine, 얇은 rim border, 부드러운 drop shadow를 기본 재질로 사용한다.
+- 색상은 역할 기반으로 제한한다. neutral/primary/success/warning/risk/insight 중 필요한 3~5개만 사용하고, 의미 없는 다색 장식은 피한다.
+- SVG 외곽과 주요 요소 사이에는 최소 48px, 권장 64px 이상의 safe margin을 둔다.
+- 카드·패널·배지 내부 요소는 보더에 붙지 않게 최소 20px, 권장 24px 이상의 internal padding을 둔다.
+- 텍스트는 절대 박스·라운드·배지 경계 밖으로 튀어나오면 안 된다. 라벨 글자수와 줄 수를 기준으로 박스 폭·높이·radius를 먼저 산정한다.
+- 모든 SVG는 `viewBox`, `preserveAspectRatio`, 충분한 대비, 외부 폰트 의존 최소화, light/dark/PDF 식별성을 고려해 작성한다.
+- SVG 아래에는 짧은 caption 또는 source note를 두어 그림의 의미와 근거를 설명한다.
+
+### Mermaid fallback 기준
+
+Mermaid는 다음 상황에서만 사용한다.
+
+- 빠른 초안 또는 회의 중 즉석 구조화가 필요한 경우
+- Obsidian 원문 안에서 텍스트 기반으로 간단한 흐름을 유지해야 하는 경우
+- SVG 파일 생성이 불가능하거나 사용자가 Mermaid를 명시적으로 요청한 경우
+- 매우 단순한 플로우/시퀀스라서 SVG 제작 비용이 설명 가치보다 큰 경우
 
 ### A3 PDF 가로폭 제한
 
-- 가로 다이어그램(`flowchart LR`)은 노드 6개 이하로 제한
+- SVG 가로 다이어그램은 한 줄 노드 4~5개 이하를 권장하고, Mermaid fallback의 `flowchart LR`은 노드 6개 이하로 제한
 - 노드가 많으면 `flowchart TB` 세로 방향 또는 wrap (subgraph 상하 적층)
 - Gantt는 일자 단위(7~14일)로 짧게 구성
 - 노드 텍스트도 짧게 (`<br/>` 줄바꿈 활용)
