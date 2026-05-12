@@ -5,6 +5,28 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.16.0] — 2026-05-12
+
+### Collection / Outputs Folder Unification
+
+문서량이 늘어나면서 파일 관리와 Obsidian 뷰어 접근성을 개선하기 위해 수집·산출 폴더 정책을 단순화하고, 운영 스크립트를 `scripts/` 하위로 통합했다.
+
+**AGENTS.md 변경:**
+- 볼트 구조 트리를 Win/macOS 양쪽에서 동일하게 동작하는 상대경로 기반으로 단순화
+- 수집 폴더를 두 곳으로 명확화: `raw/articles/`, `raw/obsidian/Clippings/` (각각 `YYYYMM/` 하위)
+- 산출 폴더는 `raw/obsidian/outputs/YYYYMM/`만 사용 — 별도 `reports/`, `workshops/`, `drafts/` 하위 폴더 폐지
+- 첨부는 `outputs/YYYYMM/attachments/`로 통일
+- 모든 운영 스크립트 산출물은 `scripts/wiki-ops/`, 그래프 산출물은 `scripts/graphify-out/`로 통합
+- 수집 폴더 자동 정리 스크립트 `organize-collection-by-month.ps1` 추가
+- Obsidian Web Clipper 저장 위치를 `raw/obsidian/Clippings/YYYYMM/`로 명시
+- 외부 owen-wiki 경로를 `D:\JAELE\owen-wiki\` → `C:\OWEN\Drive\owen-wiki\`로 동기화
+- 호환용 stub 설명 추가 (Win: 텍스트 stub, macOS: 심볼릭 링크)
+
+**scripts/ 변경:**
+- `organize-collection-by-month.ps1` 신규: articles + Clippings 두 수집 폴더의 직속 신규 파일을 frontmatter `created` 또는 mtime 기준 `YYYYMM/`로 자동 정리. 기존 큐레이션 하위 폴더는 보호.
+- `organize-outputs-by-month.ps1` (이전 organize-reports-by-month.ps1) 갱신: outputs/ 직속 파일을 `YYYYMM/`로 정리
+- `organize-outputs-attachments-by-month.ps1` (이전 organize-reports-attachments-by-month.ps1) 갱신: 첨부를 참조 문서의 월에 맞춰 `YYYYMM/attachments/`로 정리
+
 ## [1.15.1] — 2026-05-08
 
 ### Document Authoring Visual Policy

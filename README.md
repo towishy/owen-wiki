@@ -58,7 +58,7 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 | 품질 관리 | 주기적 lint 개념 중심 | broken/orphan/tag/stub/ontology quality gate + ops dashboard |
 | 대량 자료 처리 | 수동 ingest 중심 | binary extraction, auto cluster hub, remaining raw registry, promotion lifecycle |
 | 온톨로지 | 위키링크 중심 | `[[A]] [relation] [[B]]` 관계 그래프 + JSONL sidecar + relation rewrite |
-| 산출물 | 위키 자체가 주 산출물 | `outputs/reports`, `outputs/presentations`, `outputs/workshops`로 재가공 |
+| 산출물 | 위키 자체가 주 산출물 | `raw/obsidian/outputs/YYYYMM/`에 월별로 재가공 (Marp/PPTX/DOCX 등) |
 | 재사용성 | 개인 지식 베이스 패턴 | 복사 가능한 템플릿 킷 + starter files + scripts + ontology templates |
 
 초기 패턴의 흐름이 다음과 같다면:
@@ -246,7 +246,7 @@ raw/
 
 | 스크립트 | 용도 |
 |---------|------|
-| `wiki-stats.py` | `--write-ops`로 canonical `outputs/wiki-ops/repo-metrics.json` 생성 |
+| `wiki-stats.py` | `--write-ops`로 canonical `scripts/wiki-ops/repo-metrics.json` 생성 |
 | `compute-pagerank.py` | raw PageRank와 query-adjusted rank를 함께 산출 |
 | `wiki-quality-gates.py` | orphan/ontology/tag drift를 strict failure로 처리 |
 
@@ -271,11 +271,12 @@ raw/
 # 1. 프로젝트 폴더 생성
 mkdir my-wiki && cd my-wiki
 
-# 2. 디렉토리 구조 생성
-mkdir -p raw/{assets,articles,papers,notes,extracted} \
+# 2. 디렉토리 구조 생성 (수집 폴더 2개 + 산출 월별만)
+mkdir -p raw/articles \
+         raw/obsidian/Clippings \
+         raw/obsidian/outputs \
          wiki/{entities,concepts,summaries,comparisons,synthesis,ontology} \
-         outputs/{presentations,reports,workshops,drafts,wiki-ops} \
-         scripts templates
+         scripts/{wiki-ops,graphify-out} templates
 
 # 3. Owen-WIKI 킷에서 파일 복사
 cp <path-to>/owen-wiki/AGENTS.md ./AGENTS.md
@@ -288,7 +289,7 @@ mkdir -p .github/workflows && cp <path-to>/owen-wiki/.github/workflows/wiki-lint
 # 4. AGENTS.md를 열어 도메인/경로를 자신의 것으로 수정
 
 # 5. Git 초기화 (선택)
-git init && echo ".venv/\nraw/extracted/\ngraphify-out/" > .gitignore
+git init && echo ".venv/\nraw/extracted/\nscripts/graphify-out/" > .gitignore
 
 # 6. 첫 소스를 raw/에 넣고 LLM에게 "ingest 해줘" 지시
 #    → sanitize-ingest.py가 자동으로 PII 점검 후 진행

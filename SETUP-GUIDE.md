@@ -20,13 +20,13 @@
 
 1. Obsidian 설치 → 프로젝트 폴더를 Vault로 열기
 2. **Settings → Files and links**:
-   - Default location for new attachments: `raw/assets/`
+   - Default location for new attachments: `raw/obsidian/Clippings/` 또는 산출물 첨부는 `raw/obsidian/outputs/YYYYMM/attachments/`
    - New link format: `Shortest path when possible`
    - Use `[[Wikilinks]]`: ON
 3. **커뮤니티 플러그인 설치**:
    - Dataview: YAML 프론트매터 동적 쿼리
    - Marp Slides: 마크다운 슬라이드 생성
-   - Web Clipper (브라우저 확장): 기사 → 마크다운 클리핑
+   - Web Clipper (브라우저 확장): 기사 → 마크다운 클리핑 (저장 위치: `raw/obsidian/Clippings/YYYYMM/`)
 
 ---
 
@@ -36,7 +36,8 @@
 # 프로젝트 루트에서 실행
 PROJECT_ROOT="my-wiki"  # ← 원하는 이름으로 변경
 
-mkdir -p "$PROJECT_ROOT"/{raw/{assets,articles,papers,notes,extracted},wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},outputs/{presentations,reports,workshops,drafts,wiki-ops},scripts,templates,.github/workflows}
+# 수집 폴더는 articles + Clippings 두 곳만, 산출물은 월별 폴더만 사용
+mkdir -p "$PROJECT_ROOT"/{raw/articles,raw/obsidian/Clippings,raw/obsidian/outputs,wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},scripts/{wiki-ops,graphify-out},templates,.github/workflows}
 
 cd "$PROJECT_ROOT"
 ```
@@ -45,23 +46,22 @@ cd "$PROJECT_ROOT"
 
 ```
 my-wiki/
-├── raw/                   ← 사용자가 소스를 넣는 곳
-│   ├── assets/            ← 이미지, CSV 등
-│   ├── articles/          ← 웹 기사
-│   ├── papers/            ← 논문
-│   ├── notes/             ← 메모
-│   └── extracted/         ← 바이너리→마크다운 변환 결과
-├── wiki/                  ← LLM이 관리하는 위키
-│   ├── entities/
-│   ├── concepts/
-│   ├── summaries/
-│   ├── comparisons/
-│   ├── synthesis/
-│   └── ontology/          ← 관계 그래프
-├── outputs/               ← 최종 산출물
-│   └── wiki-ops/          ← 운영 대시보드·품질 리포트·metrics JSON
+├── raw/                                ← 사용자가 소스를 넣는 곳
+│   ├── articles/  ← **수집 폴더 1**: 웹 기사·외부 자료
+│   │   └── YYYYMM/  ← 월별 하위로만 파일 생성
+│   └── obsidian/
+│       ├── Clippings/  ← **수집 폴더 2**: Web Clipper 저장
+│       │   └── YYYYMM/  ← 월별 하위로만 파일 생성
+│       └── outputs/    ← 최종 산출물 (월별 폴더만)
+│           └── YYYYMM/
+│               └── attachments/
+├── wiki/                               ← LLM이 관리하는 위키
+│   ├── entities/  concepts/  summaries/  comparisons/  synthesis/
+│   └── ontology/                       ← 관계 그래프
 ├── scripts/
-├── .github/workflows/     ← CI quality gates
+│   ├── wiki-ops/                       ← 운영 대시보드·리포트·metrics JSON
+│   └── graphify-out/                   ← 그래프 시각화 산출물
+├── .github/workflows/                  ← CI quality gates
 └── templates/
 ```
 
@@ -143,9 +143,10 @@ git commit -m "init: Owen-WIKI template setup"
 가장 쉬운 방법: 관심 있는 웹 기사를 마크다운으로 저장한다.
 
 ```bash
-# 방법 A: Obsidian Web Clipper로 기사 클리핑 → raw/articles/에 저장
-# 방법 B: 직접 마크다운 파일 생성
-echo "# My First Source\n\nThis is a test article about..." > raw/articles/first-article.md
+# 방법 A: Obsidian Web Clipper로 기사 클리핑 → raw/obsidian/Clippings/YYYYMM/ 안에 저장
+# 방법 B: 직접 마크다운 파일 생성 (YYYYMM 폴더에 넣으면 자동 정리 불필요)
+mkdir -p raw/articles/202605
+echo "# My First Source\n\nThis is a test article about..." > raw/articles/202605/first-article.md
 ```
 
 ### 6.2 LLM에게 인제스트 지시
@@ -153,7 +154,7 @@ echo "# My First Source\n\nThis is a test article about..." > raw/articles/first
 VS Code / Cursor에서 LLM 에이전트에게:
 
 ```
-raw/articles/first-article.md 를 인제스트해줘
+raw/articles/202605/first-article.md 를 인제스트해줘
 ```
 
 LLM이 수행할 작업:
@@ -196,7 +197,7 @@ Obsidian에서 Graph View를 열면 첫 번째 페이지 네트워크가 보인�
 - Comparison 페이지 활성화
 
 ### 소스 200개 이상 (확장기)
-- `scripts/wiki-ops-dashboard.py`로 `outputs/wiki-ops/` 운영 대시보드 생성
+- `scripts/wiki-ops-dashboard.py`로 `scripts/wiki-ops/` 운영 대시보드 생성
 - `scripts/wiki-action-queue.py`와 `scripts/registry-promotion-workbench.py`로 registry 승격 후보 검토
 - `scripts/wiki-query.py`로 질의 후보를 query-adjusted ranking으로 라우팅
 - qmd 등 검색 엔진 도입 고려
