@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="160" viewBox="0 0 760 160" role="img" aria-labelledby="title desc">
+  <title id="title">Owen-WIKI sponsor card</title>
+  <desc id="desc">A compact GitHub Sponsors card for the Owen-WIKI README, inviting readers to support the project with a coffee.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="0.58" stop-color="#eef7fb"/>
+      <stop offset="1" stop-color="#f3f0ff"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#f8fbff" stop-opacity="0.72"/>
+    </linearGradient>
+    <linearGradient id="coffee" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="button" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-30%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#334155" flood-opacity="0.14"/>
+    </filter>
+    <style>
+      text { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; letter-spacing: 0; }
+      .kicker { fill: #0f766e; font-size: 10px; font-weight: 800; }
+      .title { fill: #111827; font-size: 22px; font-weight: 850; }
+      .body { fill: #475569; font-size: 13px; font-weight: 650; }
+      .buttonText { fill: #ffffff; font-size: 13px; font-weight: 850; }
+      .spark { stroke: #7dd3fc; stroke-width: 2.2; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect width="760" height="160" rx="0" fill="url(#bg)"/>
+  <g filter="url(#softShadow)">
+    <rect x="20" y="18" width="720" height="124" rx="12" fill="url(#panel)" stroke="#cbd5e1" stroke-width="1.1"/>
+  </g>
+
+  <g transform="translate(52 49)">
+    <circle cx="31" cy="31" r="31" fill="#ecfeff" stroke="#bae6fd" stroke-width="1"/>
+    <circle cx="31" cy="31" r="23" fill="url(#coffee)" opacity="0.12"/>
+    <path d="M20 35h22c0 9-5 15-11 15S20 44 20 35Z" fill="#ffffff" stroke="#0f766e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M42 37h5c5 0 8 3 8 7s-3 7-8 7h-4" fill="none" stroke="#0f766e" stroke-width="3" stroke-linecap="round"/>
+    <path d="M19 54h26" stroke="#0f766e" stroke-width="3" stroke-linecap="round"/>
+    <path d="M25 20c-3 4 3 6 0 10" class="spark"/>
+    <path d="M33 18c-3 4 3 6 0 10" class="spark"/>
+    <path d="M41 20c-3 4 3 6 0 10" class="spark"/>
+  </g>
+
+  <g transform="translate(128 52)">
+    <text class="kicker" x="0" y="0">GITHUB SPONSORS</text>
+    <text class="title" x="0" y="30">커피 한 잔으로 Owen-WIKI 응원하기</text>
+    <text class="body" x="0" y="58">작은 후원이 LLM Wiki 템플릿을 계속 다듬는 데 큰 힘이 됩니다.</text>
+  </g>
+
+  <a href="https://github.com/sponsors/towishy" target="_blank">
+    <g transform="translate(600 82)">
+      <rect width="116" height="38" rx="7" fill="url(#button)"/>
+      <path d="M29 9c-5-5-14-1-14 6 0 10 14 17 14 17s14-7 14-17c0-7-9-11-14-6Z" fill="#f9a8d4"/>
+      <text class="buttonText" x="54" y="24">후원하기</text>
+    </g>
+  </a>
+</svg>

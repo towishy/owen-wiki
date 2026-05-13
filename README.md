@@ -360,6 +360,16 @@ git init && echo ".venv/\nraw/extracted/\nscripts/graphify-out/" > .gitignore
 
 ---
 
+## 후원
+
+<p align="center">
+    <a href="https://github.com/sponsors/towishy">
+        <img src="assets/sponsor-coffee.svg" alt="커피 한 잔으로 Owen-WIKI 응원하기" width="560">
+    </a>
+</p>
+
+---
+
 ## 라이선스
 
 MIT — 자유롭게 사용, 수정, 배포 가능.
