@@ -4,7 +4,7 @@
 
 # Owen-WIKI Template Kit
 
-![release](https://img.shields.io/badge/release-v1.15.0-0b84d8)
+![release](https://img.shields.io/badge/release-v1.16.0-0b84d8)
 ![license](https://img.shields.io/badge/license-MIT-8cc84b)
 ![LLM Wiki](https://img.shields.io/badge/LLM%20Wiki-Template-6d4df2)
 ![Ontology](https://img.shields.io/badge/Knowledge%20Graph-Ontology-0f9d92)
@@ -17,16 +17,16 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.15.0 (2026-05-07)
+**Version**: 1.16.0 (2026-05-22)
 
-**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 669 페이지 / 6,487 위키링크 / 665 온톨로지 관계 / raw 5,907 파일 / **Microsoft Security 27/27 제품 커버리지** 운영 경험 기반
+**Origin**: Owen's LLM Wiki — Microsoft Security 도메인 702 페이지 / 7,451 위키링크 / 740 온톨로지 관계 / 10,097 raw episodes / **Microsoft Security 27/27 제품 커버리지** 운영 경험 기반
 
-**Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장 + LightRAG (HKUDS, EMNLP2025) 트리플렛/리랭킹 차용
+**Based on**: Andrej Karpathy의 LLM Wiki 패턴 + Nodus Labs Knowledge Graph 확장 + LightRAG (HKUDS, EMNLP2025) 트리플렛/리랭킹 차용 + Graphiti temporal context graph 설계 반영
 
 ---
 
 
-## 13가지 핵심 특징
+## 14가지 핵심 특징
 
 1. **🤖 LLM-Native KB** — AGENTS.md 하나로 인제스트·질의·점검·온톨로지·산출물까지 자율 운영. 사람은 raw 입력과 outputs 검토만.
 2. **📂 3-Layer 분리** — `raw/`(불변 입력) → `wiki/`(LLM 정제) → `outputs/`(공동 산출). 책임 경계가 깔끔.
@@ -39,8 +39,9 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 9. **🧬 Ontology Relation Refinement (v1.13)** — weak `related-to`를 canonical relation으로 줄이고, sidecar 품질 루프를 운영.
 10. **🏗️ Architecture Hardening (v1.14)** — canonical metrics, query-adjusted PageRank, strict sidecar, strict CI로 지표 drift 차단.
 11. **⚙️ Operational Automation (v1.15)** — query router, graph hygiene, metrics snippets, related-to budget, graph delta, registry workbench, release automation.
-12. **📊 운영 검증된 스케일** — 669 페이지 / 6,487 위키링크 / 665 온톨로지 관계 / 깨진 링크 0 / 고아 0 — 모두 실측.
-13. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/work/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
+12. **⏱️ Temporal Provenance (v1.16)** — Graphiti식 `relation_id`/`episode_id`/`valid_at`/`invalid_at`/raw source lineage를 sidecar와 episode ledger에 기록.
+13. **📊 운영 검증된 스케일** — 669 페이지 / 6,487 위키링크 / 665 온톨로지 관계 / 깨진 링크 0 / 고아 0 — 모두 실측.
+14. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/github/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
 
 ---
 
@@ -52,13 +53,13 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 |------|---------------|------------------------|
 | 기본 철학 | LLM이 raw를 읽고 wiki를 작성·유지 | 동일 철학을 `AGENTS.md` 운영 규칙으로 명문화 |
 | 구조 | Raw Sources / Wiki / Schema 중심 | `raw/` → `wiki/` → `outputs/` + `wiki/ontology/` 그래프 레이어 |
-| 지식 축적 | 마크다운 페이지와 위키링크 중심 | 669 페이지, 6,487 위키링크, 665 온톨로지 관계, 10,282 distinct raw 참조 운영 검증 |
+| 지식 축적 | 마크다운 페이지와 위키링크 중심 | 702 페이지, 7,451 위키링크, 740 온톨로지 관계, 10,097 raw episodes 운영 검증 |
 | 질의 방식 | 인덱스·위키링크 기반 탐색 | 5-Route 전략 + Relevance Scoring + Query Routing Policy |
 | 신뢰도 관리 | 출처 표기는 가능하지만 lifecycle 체계는 약함 | `confidence`, `last_confirmed`, `stale_after`, `supersedes` 체계 |
 | 품질 관리 | 주기적 lint 개념 중심 | broken/orphan/tag/stub/ontology quality gate + ops dashboard |
 | 대량 자료 처리 | 수동 ingest 중심 | binary extraction, auto cluster hub, remaining raw registry, promotion lifecycle |
-| 온톨로지 | 위키링크 중심 | `[[A]] [relation] [[B]]` 관계 그래프 + JSONL sidecar + relation rewrite |
-| 산출물 | 위키 자체가 주 산출물 | `raw/obsidian/outputs/YYYYMM/`에 월별로 재가공 (Marp/PPTX/DOCX 등) |
+| 온톨로지 | 위키링크 중심 | `[[A]] [relation] [[B]]` 관계 그래프 + temporal/provenance JSONL sidecar + relation rewrite |
+| 산출물 | 위키 자체가 주 산출물 | `outputs/reports`, `outputs/presentations`, `outputs/workshops`로 재가공 |
 | 재사용성 | 개인 지식 베이스 패턴 | 복사 가능한 템플릿 킷 + starter files + scripts + ontology templates |
 
 초기 패턴의 흐름이 다음과 같다면:
@@ -75,6 +76,7 @@ raw/
     → 추출/클러스터링
     → summary/entity/concept/synthesis
     → ontology sidecar
+    → episode ledger
     → action queue
     → lifecycle/sampling
     → outputs 산출
@@ -99,10 +101,11 @@ raw/
 | **대량 흡수** | 4,000+ 파일도 ingest 없이 처리 (v1.7) | [auto-cluster-hubs.py](scripts/auto-cluster-hubs.py) + [absorb-remaining-uningested.py](scripts/absorb-remaining-uningested.py) |
 | **다음 액션 자동화** | registry 승격·synthesis 후보·태그 정규화 후보 산출 (v1.9) | [wiki-action-queue.py](scripts/wiki-action-queue.py) |
 | **후보 품질 정밀화** | generic registry 감점·part 후보 dedupe·broad product mix 감점 (v1.11) | [wiki-action-queue.py](scripts/wiki-action-queue.py) |
-| **운영 대시보드** | 품질·큐·승격 상태·온톨로지 지표 단일 진입점 (v1.10) | [wiki-ops-dashboard.py](scripts/wiki-ops-dashboard.py) |
+| **운영 대시보드** | 품질·큐·승격 상태·온톨로지·episode 지표 단일 진입점 (v1.10+) | [wiki-ops-dashboard.py](scripts/wiki-ops-dashboard.py) |
 | **승격 라이프사이클** | source registry 후보를 candidate→promoted 흐름으로 추적 (v1.10) | [registry-promotion-lifecycle.py](scripts/registry-promotion-lifecycle.py) |
 | **대표 원본 샘플링** | registry 후보의 sources 3~5개를 자동 선별 (v1.12) | [sample-registry-candidate.py](scripts/sample-registry-candidate.py) |
-| **온톨로지 기계판독** | 관계 weight/evidence/path를 JSONL로 제공 (v1.9) | [build-ontology-sidecar.py](scripts/build-ontology-sidecar.py) |
+| **온톨로지 기계판독** | 관계 weight/evidence/path + temporal/provenance를 JSONL로 제공 (v1.16) | [build-ontology-sidecar.py](scripts/build-ontology-sidecar.py) |
+| **Episode provenance** | raw 원본을 stable episode로 기록하고 파생 wiki/ontology lineage 추적 (v1.16) | [build-episode-ledger.py](scripts/build-episode-ledger.py) |
 | **관계 품질 개선** | 약한 `related-to` 관계 치환 후보 산출 (v1.11) | [check-ontology-relations.py](scripts/check-ontology-relations.py) |
 | **관계 정밀화 적용** | 안전한 `related-to` 치환을 dry-run/apply로 실행 (v1.12) | [apply-ontology-relation-suggestions.py](scripts/apply-ontology-relation-suggestions.py) |
 | **온톨로지 정밀화 루프** | weak `related-to` 예산 관리 + relation confidence/evidence tier 기록 (v1.13+) | [check-ontology-relations.py](scripts/check-ontology-relations.py) + [build-ontology-sidecar.py](scripts/build-ontology-sidecar.py) |
@@ -125,15 +128,16 @@ raw/
 <!-- wiki-metrics:readme:start -->
 | 항목 | 수치 |
 |------|-----:|
-| 위키 페이지 | **669** |
+| 위키 페이지 | **702** |
 | 온톨로지 파일 | 7 |
-| 총 라인 수 | 57,671 |
-| 총 단어 수 | 325,124 |
-| 위키링크 | **6,487** (페이지당 평균 9.7) |
-| 태그 | 610종 (`prod/` 53 · `customer/` 18 · `topic/` 489 · `type/` 38 · `series/` 12) |
-| Raw 소스 파일 | **5,907** (0.8 GB) |
-| 온톨로지 관계 | **665** (`related-to` 9, strict sidecar 기준) |
-| Git 커밋 | 131+ |
+| 총 라인 수 | 63,046 |
+| 총 단어 수 | 356,661 |
+| 위키링크 | **7,451** (페이지당 평균 10.6) |
+| 태그 | 651종 |
+| Raw 소스 파일 | **5,902** |
+| 온톨로지 관계 | **740** (temporal sidecar 기준) |
+| Raw episodes | **10,097** |
+| Git 커밋 | 170+ |
 
 ### 그래프 (graphify-out)
 
@@ -155,14 +159,14 @@ raw/
 | 파일 | 용도 | 행동 |
 |------|------|------|
 | `README.md` | 이 파일 — 전체 가이드 | 읽기 |
-| `AGENTS.md` | LLM 에이전트 스키마 v1.15 (복사하여 사용) | 프로젝트 루트에 복사 |
+| `AGENTS.md` | LLM 에이전트 스키마 v1.16 (복사하여 사용) | 프로젝트 루트에 복사 |
 | `SETUP-GUIDE.md` | 단계별 설정 가이드 | 따라하기 |
 | `CHANGELOG.md` | 템플릿 킷 버전 변경 이력 | 참고 |
 | `templates/` | 위키 페이지 템플릿 5종 | `templates/`에 복사 |
 | `starter-files/` | index.md, log.md, overview.md 초기본 | 프로젝트 루트에 복사 |
 | `ontology-templates/` | 온톨로지 파일 초기본 | `wiki/ontology/`에 복사 |
 
-### 스크립트 46종 (`scripts/`)
+### 스크립트 47종 (`scripts/`)
 
 **기본 lint·통계 (8종)**
 
@@ -246,7 +250,7 @@ raw/
 
 | 스크립트 | 용도 |
 |---------|------|
-| `wiki-stats.py` | `--write-ops`로 canonical `scripts/wiki-ops/repo-metrics.json` 생성 |
+| `wiki-stats.py` | `--write-ops`로 canonical `outputs/wiki-ops/repo-metrics.json` 생성 |
 | `compute-pagerank.py` | raw PageRank와 query-adjusted rank를 함께 산출 |
 | `wiki-quality-gates.py` | orphan/ontology/tag drift를 strict failure로 처리 |
 
@@ -263,6 +267,14 @@ raw/
 | `registry-promotion-workbench.py` | registry 승격 후보 review packet 생성 |
 | `release-wiki.py` | validation → metrics update → commit/tag/push/GitHub Release 자동화 |
 
+**v1.16.0 신규 — Temporal Provenance**
+
+| 스크립트 | 용도 |
+|---------|------|
+| `build-ontology-sidecar.py` | `relation_id`, `episode_id`, `valid_at`, `invalid_at`, `stale_after`, `fact_status`, `raw_sources` 포함 sidecar 생성 |
+| `build-episode-ledger.py` | raw source를 stable episode로 기록하고 derived wiki pages / ontology relations lineage 생성 |
+| `wiki-ops-dashboard.py` | episode ledger coverage를 운영 대시보드에 통합 |
+
 ---
 
 ## Quick Start (5분 세팅)
@@ -276,20 +288,20 @@ mkdir -p raw/articles \
          raw/obsidian/Clippings \
          raw/obsidian/outputs \
          wiki/{entities,concepts,summaries,comparisons,synthesis,ontology} \
-         scripts/{wiki-ops,graphify-out} templates
+         outputs/wiki-ops graphify-out templates
 
 # 3. Owen-WIKI 킷에서 파일 복사
 cp <path-to>/owen-wiki/AGENTS.md ./AGENTS.md
 cp <path-to>/owen-wiki/starter-files/* ./
 cp <path-to>/owen-wiki/templates/* ./templates/
 cp <path-to>/owen-wiki/ontology-templates/* ./wiki/ontology/
-cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.15.0: Operational Automation 포함
+cp <path-to>/owen-wiki/scripts/* ./scripts/   # v1.16.0: Temporal Provenance 포함
 mkdir -p .github/workflows && cp <path-to>/owen-wiki/.github/workflows/wiki-lint.yml ./.github/workflows/
 
 # 4. AGENTS.md를 열어 도메인/경로를 자신의 것으로 수정
 
 # 5. Git 초기화 (선택)
-git init && echo ".venv/\nraw/extracted/\nscripts/graphify-out/" > .gitignore
+git init && echo ".venv/\nraw/extracted/\ngraphify-out/" > .gitignore
 
 # 6. 첫 소스를 raw/에 넣고 LLM에게 "ingest 해줘" 지시
 #    → sanitize-ingest.py가 자동으로 PII 점검 후 진행

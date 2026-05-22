@@ -15,6 +15,7 @@ OUT_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-ops-dashboard.json'
 ACTION_QUEUE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'wiki-action-queue.json'
 LIFECYCLE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'registry-promotion-lifecycle.json'
 ONTOLOGY_JSONL = OUTPUTS_ROOT / 'wiki-ops' / 'ontology-sidecar.jsonl'
+EPISODE_LEDGER_JSONL = OUTPUTS_ROOT / 'wiki-ops' / 'episode-ledger.jsonl'
 RELATION_QUALITY_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'ontology-relation-quality.json'
 REPO_METRICS_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'repo-metrics.json'
 GRAPH_HYGIENE_JSON = OUTPUTS_ROOT / 'wiki-ops' / 'graph-hygiene.json'
@@ -72,10 +73,37 @@ def ontology_counts():
     return {'relations': relations, 'by_relation': dict(by_relation.most_common(10))}
 
 
+def episode_counts():
+    if not EPISODE_LEDGER_JSONL.exists():
+        return {'episodes': 0, 'existing': 0, 'missing': 0, 'with_relations': 0, 'top_groups': {}}
+    episodes = 0
+    existing = 0
+    with_relations = 0
+    groups = Counter()
+    for line in EPISODE_LEDGER_JSONL.read_text(encoding='utf-8').splitlines():
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        episodes += 1
+        if record.get('source_exists'):
+            existing += 1
+        if record.get('derived_relation_count'):
+            with_relations += 1
+        groups[record.get('source_group', 'unknown')] += 1
+    return {
+        'episodes': episodes,
+        'existing': existing,
+        'missing': episodes - existing,
+        'with_relations': with_relations,
+        'top_groups': dict(groups.most_common(5)),
+    }
+
+
 def build_payload():
     previous = load_json(OUT_JSON, {})
     run_script('wiki-stats.py', '--write-ops')
     run_script('build-ontology-sidecar.py')
+    run_script('build-episode-ledger.py')
     run_script('wiki-action-queue.py')
     run_script('registry-promotion-lifecycle.py')
     run_script('check-ontology-relations.py')
@@ -106,6 +134,7 @@ def build_payload():
             'top_items': lifecycle.get('items', [])[:10],
         },
         'ontology': ontology_counts(),
+        'episodes': episode_counts(),
         'relation_quality': relation_quality,
         'graph_hygiene': graph_hygiene,
         'graph_delta': graph_delta,
@@ -152,6 +181,7 @@ def render(payload):
     action = payload['action_queue']
     lifecycle = payload['lifecycle']
     ontology = payload['ontology']
+    episodes = payload.get('episodes', {})
     relation_quality = payload.get('relation_quality', {})
     graph_hygiene = payload.get('graph_hygiene', {})
     graph_delta = payload.get('graph_delta', {})
@@ -256,6 +286,24 @@ def render(payload):
     ]
     for relation, count in ontology.get('by_relation', {}).items():
         lines.append(f'| `{relation}` | {count} |')
+    lines += [
+        '',
+        '## Episode Ledger',
+        '',
+        f"- Episodes: `{episodes.get('episodes', 0)}`",
+        '- Ledger: `outputs/wiki-ops/episode-ledger.jsonl`',
+        '',
+        '| Signal | Count |',
+        '|---|---:|',
+        f"| Existing raw files | {episodes.get('existing', 0)} |",
+        f"| Missing raw references | {episodes.get('missing', 0)} |",
+        f"| Episodes linked to ontology relations | {episodes.get('with_relations', 0)} |",
+        '',
+        '| Top source group | Episodes |',
+        '|---|---:|',
+    ]
+    for group, count in episodes.get('top_groups', {}).items():
+        lines.append(f'| `{group}` | {count} |')
     lines += [
         '',
         '## Ontology Relation Quality',

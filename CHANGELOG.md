@@ -5,27 +5,43 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
-## [1.16.0] — 2026-05-12
+## [1.16.0] — 2026-05-22
+
+### Temporal Provenance + Episode Ledger
+
+Graphiti의 temporal context graph 설계를 템플릿 킷에 흡수하되, Neo4j/FalkorDB 같은 외부 graph DB를 필수로 만들지 않고 Markdown + JSONL sidecar 방식으로 적용했다.
+
+**AGENTS.md 변경:**
+- `### Temporal Provenance (v1.16+)` 섹션 추가
+- `build-episode-ledger.py` 운영 도구 등록
+- `build-ontology-sidecar.py` 설명을 temporal/provenance 필드 포함으로 갱신
+- 운영 대시보드 설명에 episode ledger coverage 추가
+
+**README 변경:**
+- 릴리즈 배지와 버전 표기를 `v1.16.0`으로 갱신
+- 핵심 특징에 Temporal Provenance 추가
+- 스크립트 카탈로그를 47종 기준으로 갱신
+- Quick Start 복사 설명을 v1.16.0 기준으로 갱신
+
+**스크립트 추가/강화:**
+- `build-episode-ledger.py` 신규 추가 — raw source를 stable episode로 기록하고 derived wiki pages / ontology relations lineage를 JSONL/MD로 생성
+- `build-ontology-sidecar.py` 강화 — `relation_id`, `episode_id`, `valid_at`, `invalid_at`, `stale_after`, `fact_status`, `raw_sources` 필드 추가
+- `wiki-ops-dashboard.py` 강화 — episode count, missing raw references, ontology-linked episodes를 대시보드에 표시
+- `weekly-gap-report.py` 강화 — 주간 리포트에 Episode Ledger 섹션 추가
 
 ### Collection / Outputs Folder Unification
 
-문서량이 늘어나면서 파일 관리와 Obsidian 뷰어 접근성을 개선하기 위해 수집·산출 폴더 정책을 단순화하고, 운영 스크립트를 `scripts/` 하위로 통합했다.
+문서량이 늘어나면서 파일 관리와 Obsidian 뷰어 접근성을 개선하기 위해 수집·산출 폴더 정책을 단순화했다.
 
 **AGENTS.md 변경:**
 - 볼트 구조 트리를 Win/macOS 양쪽에서 동일하게 동작하는 상대경로 기반으로 단순화
 - 수집 폴더를 두 곳으로 명확화: `raw/articles/`, `raw/obsidian/Clippings/` (각각 `YYYYMM/` 하위)
-- 산출 폴더는 `raw/obsidian/outputs/YYYYMM/`만 사용 — 별도 `reports/`, `workshops/`, `drafts/` 하위 폴더 폐지
-- 첨부는 `outputs/YYYYMM/attachments/`로 통일
-- 모든 운영 스크립트 산출물은 `scripts/wiki-ops/`, 그래프 산출물은 `scripts/graphify-out/`로 통합
-- 수집 폴더 자동 정리 스크립트 `organize-collection-by-month.ps1` 추가
-- Obsidian Web Clipper 저장 위치를 `raw/obsidian/Clippings/YYYYMM/`로 명시
-- 외부 owen-wiki 경로를 `D:\JAELE\owen-wiki\` → `C:\OWEN\Drive\owen-wiki\`로 동기화
+- 산출 폴더와 첨부 파일의 월별 정리 정책 반영
+- 수집 폴더 자동 정리 스크립트와 Obsidian Web Clipper 저장 위치 명시
 - 호환용 stub 설명 추가 (Win: 텍스트 stub, macOS: 심볼릭 링크)
 
-**scripts/ 변경:**
-- `organize-collection-by-month.ps1` 신규: articles + Clippings 두 수집 폴더의 직속 신규 파일을 frontmatter `created` 또는 mtime 기준 `YYYYMM/`로 자동 정리. 기존 큐레이션 하위 폴더는 보호.
-- `organize-outputs-by-month.ps1` (이전 organize-reports-by-month.ps1) 갱신: outputs/ 직속 파일을 `YYYYMM/`로 정리
-- `organize-outputs-attachments-by-month.ps1` (이전 organize-reports-attachments-by-month.ps1) 갱신: 첨부를 참조 문서의 월에 맞춰 `YYYYMM/attachments/`로 정리
+**설정 가이드 변경:**
+- 소스 200개 이상 확장기 운영 루프에 `build-episode-ledger.py` 추가
 
 ## [1.15.1] — 2026-05-08
 

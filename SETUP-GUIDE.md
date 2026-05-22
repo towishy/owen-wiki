@@ -37,7 +37,7 @@
 PROJECT_ROOT="my-wiki"  # ← 원하는 이름으로 변경
 
 # 수집 폴더는 articles + Clippings 두 곳만, 산출물은 월별 폴더만 사용
-mkdir -p "$PROJECT_ROOT"/{raw/articles,raw/obsidian/Clippings,raw/obsidian/outputs,wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},scripts/{wiki-ops,graphify-out},templates,.github/workflows}
+mkdir -p "$PROJECT_ROOT"/{raw/articles,raw/obsidian/Clippings,raw/obsidian/outputs,wiki/{entities,concepts,summaries,comparisons,synthesis,ontology},outputs/wiki-ops,graphify-out,templates,.github/workflows}
 
 cd "$PROJECT_ROOT"
 ```
@@ -197,7 +197,8 @@ Obsidian에서 Graph View를 열면 첫 번째 페이지 네트워크가 보인�
 - Comparison 페이지 활성화
 
 ### 소스 200개 이상 (확장기)
-- `scripts/wiki-ops-dashboard.py`로 `scripts/wiki-ops/` 운영 대시보드 생성
+- `scripts/wiki-ops-dashboard.py`로 `outputs/wiki-ops/` 운영 대시보드 생성
+- `scripts/build-episode-ledger.py`로 raw source episode와 derived wiki/ontology lineage 생성
 - `scripts/wiki-action-queue.py`와 `scripts/registry-promotion-workbench.py`로 registry 승격 후보 검토
 - `scripts/wiki-query.py`로 질의 후보를 query-adjusted ranking으로 라우팅
 - qmd 등 검색 엔진 도입 고려

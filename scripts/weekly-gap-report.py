@@ -38,10 +38,11 @@ def main():
     sections.append(('## 6. Tag Drift', run('check-tags.py')))
     sections.append(('## 7. Raw → Wiki 변환율', run('build-raw-to-wiki-map.py')))
     sections.append(('## 8. Ontology Sidecar', run('build-ontology-sidecar.py')))
-    sections.append(('## 9. Action Queue', run('wiki-action-queue.py')))
-    sections.append(('## 10. Registry Promotion Lifecycle', run('registry-promotion-lifecycle.py')))
-    sections.append(('## 11. Ontology Relation Quality', run('check-ontology-relations.py')))
-    sections.append(('## 12. Operations Dashboard', run('wiki-ops-dashboard.py')))
+    sections.append(('## 9. Episode Ledger', run('build-episode-ledger.py')))
+    sections.append(('## 10. Action Queue', run('wiki-action-queue.py')))
+    sections.append(('## 11. Registry Promotion Lifecycle', run('registry-promotion-lifecycle.py')))
+    sections.append(('## 12. Ontology Relation Quality', run('check-ontology-relations.py')))
+    sections.append(('## 13. Operations Dashboard', run('wiki-ops-dashboard.py')))
 
     lines = [
         '---', f'title: "Weekly Gap Report — {TODAY}"', 'type: report',

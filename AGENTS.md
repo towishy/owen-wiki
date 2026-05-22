@@ -27,11 +27,11 @@
 ├── wiki/                      ← LLM이 관리하는 위키 페이지 + 온톨로지
 │   ├── entities/  concepts/  summaries/  comparisons/  synthesis/
 │   └── ontology/   ← 관계 그래프 레이어
-├── outputs                    ← 호환용 stub → raw/obsidian/outputs (Win: 텍스트 stub / macOS: 심볼릭 링크)
-├── scripts/                   ← **모든 유틸리티 스크립트는 여기 또는 하위 폴더에만**
-│   ├── *.py / *.ps1 / *.sh
-│   ├── graphify-out/          ← 위키 그래프 시각화 산출물
+├── outputs/                   ← 호환용 stub → raw/obsidian/outputs (Win: 텍스트 stub / macOS: 심볼릭 링크)
 │   └── wiki-ops/              ← 운영 대시보드·메트릭·리포트 산출물
+├── scripts/                   ← **모든 유틸리티 스크립트는 여기 또는 하위 폴더에만**
+│   └── *.py / *.ps1 / *.sh
+├── graphify-out/              ← 위키 그래프 시각화 산출물
 ├── docs/                      ← 운영 가이드
 ├── lib/                       ← 외부 라이브러리 자산 (vis.js 등)
 └── templates/                 ← 페이지 템플릿
@@ -439,7 +439,7 @@ style MyNode fill:#E0F2FE,stroke:#0EA5E9,color:#075985
 
 ### 확장 5색 팔레트 (용도별 선택)
 
-표준 4색이 부족할 때(5+ 카테고리, 다단계 절차, 강한 대비 필요) 아래 3종 5색 팔레트 중 하나를 선택해 사용한다. 전체 정의·샘플은 [scripts/wiki-ops/references/mermaid-warm-pastel-palette-sample.md](scripts/wiki-ops/references/mermaid-warm-pastel-palette-sample.md) 참조.
+표준 4색이 부족할 때(5+ 카테고리, 다단계 절차, 강한 대비 필요) 아래 3종 5색 팔레트 중 하나를 선택해 사용한다. 전체 정의·샘플은 [outputs/wiki-ops/references/mermaid-warm-pastel-palette-sample.md](outputs/wiki-ops/references/mermaid-warm-pastel-palette-sample.md) 참조.
 
 | 팔레트 | 5색 구성 | 적합 용도 |
 |--------|---------|---------|
@@ -476,7 +476,7 @@ classDef train fill:#d6eaf8,stroke:#2980b9,stroke-width:1px
 A[Data Prep]:::prep --> B[Training]:::train
 ```
 
-샘플: [scripts/wiki-ops/references/mermaid-ml-pipeline-palette-sample.md](scripts/wiki-ops/references/mermaid-ml-pipeline-palette-sample.md)
+샘플: [outputs/wiki-ops/references/mermaid-ml-pipeline-palette-sample.md](outputs/wiki-ops/references/mermaid-ml-pipeline-palette-sample.md)
 
 ### 제품별 식별 색상 (필요 시만)
 
@@ -561,20 +561,20 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 
 ## 스케일 & 도구
 
-### 현재 규모 (2026-05-07, v1.15.0)
+### 현재 규모 (2026-05-22, v1.16.0)
 <!-- wiki-metrics:agents:start -->
-- raw/ 전체: 5,907 인덱싱 파일 (workspace 직속 ~821 MB) + 외부 심볼릭 링크 6종 (articles / obsidian / fy26-readiness / readiness-archives / security-onsite-reports / security-microsoft-documents)
-- wiki/ 페이지: **669** (entities 90 / concepts 54 / summaries 484 / comparisons 8 / synthesis 26 / ontology 7, 인덱스 포함 Markdown 681개)
-- 위키링크: 6,487개 (페이지당 평균 9.7)
-- 온톨로지 관계: 665개 (`related-to` 9개, v1.15.0 strict sidecar 후)
-- **raw → wiki 참조**: 10,282 distinct raw 파일이 wiki 페이지에서 인용됨 (662 wiki 페이지 스캔)
+- raw/ 전체: 5,902 파일 (canonical scan 기준)
+- wiki/ 페이지: **702**
+- 위키링크: 7,451개 (페이지당 평균 10.6)
+- 온톨로지 관계: 740개 (v1.16.0 temporal sidecar 기준)
+- **raw episode ledger**: 10,097 episodes (`outputs/wiki-ops/episode-ledger.jsonl`)
 - Microsoft Security 제품 커버리지: **27/27 (100%)**
-- 태그: 610종 (prod/ 53 · customer/ 18 · topic/ 489 · type/ 38 · series/ 12)
+- 태그: 651종
 - Confidence 분포: 0.95+ 2 / 0.80–0.94 81 / 0.65–0.79 265 / 0.40–0.64 314 / unset 0
 - 2-tier 인덱스: `index.md` (허브) + 카테고리별 `_index.md` 6개 (entities/concepts/summaries/comparisons/synthesis/ontology)
-- Git 커밋: 131개+ / 작업 로그 라인: 1,344+
+- Git 커밋: 170개+ / 작업 로그 라인: 1,350+
 - 그래프(graphify-out): 노드 674 · 엣지 3,645 · 커뮤니티 9 · 고아 0 · 깨진 링크 0
-- Canonical 운영 지표: `scripts/wiki-ops/wiki-ops-dashboard.json`, 저장소 규모 지표: `scripts/wiki-ops/repo-metrics.json`
+- Canonical 운영 지표: `outputs/wiki-ops/wiki-ops-dashboard.json`, 저장소 규모 지표: `outputs/wiki-ops/repo-metrics.json`
 - index.md 허브 → 카테고리 _index.md → wiki/ontology/ 기반 구조 분석을 병행한다
 <!-- wiki-metrics:agents:end -->
 
@@ -593,27 +593,28 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 
 | 스크립트 | 용도 | 출력 |
 |---------|------|------|
-| `scripts/analyze-large-hubs.py` | 50KB+ 거대 허브 식별 + sub-hub 분할 계획 | `scripts/wiki-ops/large-hubs-split-plan.md` |
-| `scripts/identify-stubs.py` | stub 페이지 자동 식별 (본문<200자, 무소스 등) | `scripts/wiki-ops/stub-pages-report.md` |
+| `scripts/analyze-large-hubs.py` | 50KB+ 거대 허브 식별 + sub-hub 분할 계획 | `outputs/wiki-ops/large-hubs-split-plan.md` |
+| `scripts/identify-stubs.py` | stub 페이지 자동 식별 (본문<200자, 무소스 등) | `outputs/wiki-ops/stub-pages-report.md` |
 | `scripts/backfill-confidence.py` | confidence/last_confirmed 휴리스틱 백필 | YAML 프론트매터 인플레이스 |
-| `scripts/build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율·고립 raw 식별) | `scripts/wiki-ops/raw-to-wiki-map.{json,md}` |
-| `scripts/wiki-action-queue.py` | registry 승격·synthesis 후보·태그 정규화·raw 지식화 등급·검색 랭킹 힌트 산출 | `scripts/wiki-ops/wiki-action-queue.{md,json}` |
-| `scripts/registry-promotion-lifecycle.py` | source registry 승격 후보의 candidate/sampled/promoted/deferred/rejected 상태 추적 | `scripts/wiki-ops/registry-promotion-lifecycle.{md,json}` |
-| `scripts/registry-promotion-workbench.py` | registry 승격 후보별 review packet 생성 | `scripts/wiki-ops/registry-promotion-workbench.{md,json}` |
-| `scripts/sample-registry-candidate.py` | registry 후보 sources 대표 3~5개 샘플링 패킷 생성 | `scripts/wiki-ops/registry-samples/` |
-| `scripts/wiki-ops-dashboard.py` | quality gate·action queue·promotion lifecycle·ontology sidecar 핵심 지표 단일 대시보드 생성 | `scripts/wiki-ops/wiki-ops-dashboard.{md,json}` |
-| `scripts/build-ontology-sidecar.py` | 온톨로지 관계를 JSONL sidecar로 변환 (weight/evidence/path/confidence 포함) | `scripts/wiki-ops/ontology-sidecar.{jsonl,md}` |
-| `scripts/check-ontology-relations.py` | 약한 `related-to` 관계를 더 구체적 relation으로 치환할 후보 산출 | `scripts/wiki-ops/ontology-relation-quality.{md,json}` |
-| `scripts/apply-ontology-relation-suggestions.py` | 검토된 안전 후보를 dry-run/apply로 ontology 파일에 반영 | `scripts/wiki-ops/ontology-relation-rewrite-plan.md` |
+| `scripts/build-raw-to-wiki-map.py` | raw→wiki 역참조 맵 (변환율·고립 raw 식별) | `outputs/wiki-ops/raw-to-wiki-map.{json,md}` |
+| `scripts/build-episode-ledger.py` | Graphiti식 raw episode ledger 생성 (stable episode ID, source fingerprint, derived wiki/ontology lineage) | `outputs/wiki-ops/episode-ledger.{jsonl,md}` |
+| `scripts/wiki-action-queue.py` | registry 승격·synthesis 후보·태그 정규화·raw 지식화 등급·검색 랭킹 힌트 산출 | `outputs/wiki-ops/wiki-action-queue.{md,json}` |
+| `scripts/registry-promotion-lifecycle.py` | source registry 승격 후보의 candidate/sampled/promoted/deferred/rejected 상태 추적 | `outputs/wiki-ops/registry-promotion-lifecycle.{md,json}` |
+| `scripts/registry-promotion-workbench.py` | registry 승격 후보별 review packet 생성 | `outputs/wiki-ops/registry-promotion-workbench.{md,json}` |
+| `scripts/sample-registry-candidate.py` | registry 후보 sources 대표 3~5개 샘플링 패킷 생성 | `outputs/wiki-ops/registry-samples/` |
+| `scripts/wiki-ops-dashboard.py` | quality gate·action queue·promotion lifecycle·ontology sidecar·episode ledger 핵심 지표 단일 대시보드 생성 | `outputs/wiki-ops/wiki-ops-dashboard.{md,json}` |
+| `scripts/build-ontology-sidecar.py` | 온톨로지 관계를 JSONL sidecar로 변환 (weight/evidence/path/confidence/temporal/provenance 포함) | `outputs/wiki-ops/ontology-sidecar.{jsonl,md}` |
+| `scripts/check-ontology-relations.py` | 약한 `related-to` 관계를 더 구체적 relation으로 치환할 후보 산출 | `outputs/wiki-ops/ontology-relation-quality.{md,json}` |
+| `scripts/apply-ontology-relation-suggestions.py` | 검토된 안전 후보를 dry-run/apply로 ontology 파일에 반영 | `outputs/wiki-ops/ontology-relation-rewrite-plan.md` |
 | `scripts/generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`## 파생 산출물`) | wiki 페이지 인플레이스 |
-| `scripts/compute-pagerank.py` | Raw PageRank + query-adjusted rank로 허브/질의 후보 식별 | `scripts/wiki-ops/wiki-pagerank.md` |
-| `scripts/wiki-query.py` | Query-adjusted PageRank·태그·본문·온톨로지 기반 후보 페이지 라우팅 | stdout / `scripts/wiki-ops/query-runs/` |
-| `scripts/check-graph-hygiene.py` | placeholder/unknown/trailing wikilink로 인한 graph node 오염 탐지 | `scripts/wiki-ops/graph-hygiene.{md,json}` |
+| `scripts/compute-pagerank.py` | Raw PageRank + query-adjusted rank로 허브/질의 후보 식별 | `outputs/wiki-ops/wiki-pagerank.md` |
+| `scripts/wiki-query.py` | Query-adjusted PageRank·태그·본문·온톨로지 기반 후보 페이지 라우팅 | stdout / `outputs/wiki-ops/query-runs/` |
+| `scripts/check-graph-hygiene.py` | placeholder/unknown/trailing wikilink로 인한 graph node 오염 탐지 | `outputs/wiki-ops/graph-hygiene.{md,json}` |
 | `scripts/check-related-to-budget.py` | weak `related-to` relation 예산 강제 | stdout / CI exit code |
 | `scripts/update-metrics-snippets.py` | README/AGENTS의 canonical metrics block 자동 갱신 | README.md / AGENTS.md |
-| `scripts/graph-delta-report.py` | Git ref 대비 graph node/edge/degree 변화 리포트 | `scripts/wiki-ops/graph-delta.{md,json}` |
+| `scripts/graph-delta-report.py` | Git ref 대비 graph node/edge/degree 변화 리포트 | `outputs/wiki-ops/graph-delta.{md,json}` |
 | `scripts/release-wiki.py` | 검증·metrics snippet update·commit·tag·push·GitHub Release 자동화 | git / GitHub Release |
-| `scripts/weekly-gap-report.py` | 주간 갭 분석 종합 (orphans/broken/stubs/decay) | `scripts/wiki-ops/weekly-gaps-YYYY-MM-DD.md` |
+| `scripts/weekly-gap-report.py` | 주간 갭 분석 종합 (orphans/broken/stubs/decay) | `outputs/wiki-ops/weekly-gaps-YYYY-MM-DD.md` |
 | `scripts/wiki-quality-gates.py` | CI 품질 게이트 (broken/orphan/tag/stub/registry parent hub) | stdout / exit code |
 | `scripts/sync-to-obsidian.ps1` | wiki→Obsidian 볼트 증분 동기 (양 OS pwsh 7+) | 파일 복사 |
 | `scripts/check-ontology.py` (강화) | 양방향 supersession 검증 + 표준 관계코드 사전 | stdout |
@@ -649,7 +650,7 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 
 ### Operations Dashboard & Promotion Lifecycle (v1.10+)
 
-`scripts/wiki-ops-dashboard.py`는 흩어진 운영 리포트의 핵심 지표를 단일 진입점(`scripts/wiki-ops/wiki-ops-dashboard.md`)으로 묶는다. 대시보드는 quality gate, Action Queue, registry promotion lifecycle, ontology sidecar를 함께 보여준다.
+`scripts/wiki-ops-dashboard.py`는 흩어진 운영 리포트의 핵심 지표를 단일 진입점(`outputs/wiki-ops/wiki-ops-dashboard.md`)으로 묶는다. 대시보드는 quality gate, Action Queue, registry promotion lifecycle, ontology sidecar, episode ledger를 함께 보여준다.
 
 `scripts/registry-promotion-lifecycle.py`는 Action Queue의 source registry 승격 후보를 상태 기반으로 관리한다.
 
@@ -687,7 +688,7 @@ Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위�
 
 운영 정밀도 결과를 실제 큐레이션 행동으로 연결하기 위해 다음 자동화 루프를 사용한다.
 
-- `sample-registry-candidate.py`는 registry 후보의 `sources`에서 제품/고객/워크숍 신호가 강한 대표 파일 3~5개를 `scripts/wiki-ops/registry-samples/`에 샘플링한다.
+- `sample-registry-candidate.py`는 registry 후보의 `sources`에서 제품/고객/워크숍 신호가 강한 대표 파일 3~5개를 `outputs/wiki-ops/registry-samples/`에 샘플링한다.
 - `registry-promotion-lifecycle.py`는 각 후보에 `recommended_status`와 `recommendation_reason`을 부여해 `sampled`/`deferred` 판단을 먼저 제안한다.
 - `wiki-action-queue.py`는 신규 synthesis 후보와 기존 synthesis 확장 후보를 분리해, 이미 대표 synthesis가 있는 큰 태그를 “신규 생성”이 아니라 “기존 보강”으로 다룬다.
 - `apply-ontology-relation-suggestions.py`는 `check-ontology-relations.py` 결과 중 canonical relation으로 안전하게 치환 가능한 `related-to`만 dry-run 후 적용한다.
@@ -698,7 +699,7 @@ Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위�
 온톨로지 품질 루프는 `related-to`를 장기적으로 줄이고, 검색·랭킹·갭 분석에 의미 있는 canonical relation을 늘리는 것을 목표로 한다.
 
 - sidecar는 실제 온톨로지 relation 라인으로 시작하는 `[[A]] [relation] [[B]]`만 집계하며, 후보 표나 설명용 예시는 relation count에서 제외한다.
-- relation rewrite는 `scripts/wiki-ops/ontology-relation-quality.md`의 후보를 그대로 적용하지 않고, 대상 페이지 본문 근거를 확인한 뒤 `uses`, `feeds`, `integrates-with`, `depends-on`, `supports`, `covers`, `documents`, `references`, `complements`, `receives-signal-from` 등으로 정밀화한다.
+- relation rewrite는 `outputs/wiki-ops/ontology-relation-quality.md`의 후보를 그대로 적용하지 않고, 대상 페이지 본문 근거를 확인한 뒤 `uses`, `feeds`, `integrates-with`, `depends-on`, `supports`, `covers`, `documents`, `references`, `complements`, `receives-signal-from` 등으로 정밀화한다.
 - `references`는 고객·운영·synthesis 페이지가 교육 리소스, 개요 페이지, 참고 허브를 증거/참조 대상으로 연결할 때 사용하며, 제품 구현·데이터 흐름·의존 관계에는 사용하지 않는다.
 - 자동 스크립트의 `implemented-by` 제안은 개념/방법론 페이지에 과하게 적용될 수 있으므로, 제품 구현 관계가 명확할 때만 사용한다.
 - 정밀화 후에는 `build-ontology-sidecar.py` → `check-ontology-relations.py` → `check-ontology.py` → `wiki-quality-gates.py` 순서로 재생성·검증한다.
@@ -707,7 +708,7 @@ Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위�
 
 운영 아키텍처는 단일 지표 출처, 질의용 랭킹 보정, strict CI를 기준으로 유지한다.
 
-- 저장소 규모 지표는 `scripts/wiki-stats.py --write-ops`가 생성하는 `scripts/wiki-ops/repo-metrics.json`을 canonical source로 사용한다.
+- 저장소 규모 지표는 `scripts/wiki-stats.py --write-ops`가 생성하는 `outputs/wiki-ops/repo-metrics.json`을 canonical source로 사용한다.
 - `wiki-ops-dashboard.py`는 실행 시 repo metrics를 먼저 재생성하고, dashboard JSON/Markdown에 핵심 규모 지표를 포함한다.
 - `compute-pagerank.py`는 Raw PageRank와 Query-adjusted rank를 함께 산출한다. 일반 질의 후보 선정은 query-adjusted rank를 우선하고, 원본 PageRank는 구조적 허브 진단용으로 보존한다.
 - ontology sidecar는 `[[A]] [relation] [[B]]`로 시작하는 실제 relation 라인만 집계해 후보 표·예시 문장이 지표를 오염시키지 않도록 한다.
@@ -721,9 +722,18 @@ v1.15부터 운영 정책을 실제 실행 가능한 CLI와 CI guard로 닫는�
 - `check-graph-hygiene.py`는 placeholder, unknown target, trailing backslash 등 graph node 오염 원인을 차단하고, table 안의 escaped alias(`\|`)는 정상 alias로 정규화한다.
 - `update-metrics-snippets.py`는 README/AGENTS의 metrics block을 `repo-metrics.json`, relation quality, graph output 기준으로 갱신한다.
 - `check-related-to-budget.py`는 weak `related-to` 예산을 기본 10개로 제한해 relation drift를 CI에서 차단한다.
-- `graph-delta-report.py`는 최신 태그 대비 node/edge/degree 변화를 `scripts/wiki-ops/graph-delta.md`로 기록한다.
+- `graph-delta-report.py`는 최신 태그 대비 node/edge/degree 변화를 `outputs/wiki-ops/graph-delta.md`로 기록한다.
 - `registry-promotion-workbench.py`는 registry 승격 후보를 review packet으로 압축해 샘플링/보류/승격 판단을 빠르게 한다.
 - `release-wiki.py`는 검증, metrics snippet update, commit, tag, push, GitHub Release 생성을 한 번의 CLI로 묶는다.
+
+### Temporal Provenance (v1.16+)
+
+Graphiti의 temporal context graph 설계를 Markdown-native 운영에 맞게 흡수한다. 외부 graph DB를 필수로 두지 않고, 기존 `outputs/wiki-ops/` sidecar 파일로 provenance와 시간성을 추적한다.
+
+- `build-ontology-sidecar.py`는 각 relation에 `relation_id`, `episode_id`, `valid_at`, `invalid_at`, `stale_after`, `fact_status`, `raw_sources`를 기록한다.
+- `build-episode-ledger.py`는 wiki 페이지에서 참조된 raw source를 stable `episode_id`로 기록하고, source fingerprint, derived wiki pages, derived ontology relations를 JSONL로 남긴다.
+- `wiki-ops-dashboard.py`는 episode count, missing raw reference, ontology-linked episode 수를 함께 표시한다.
+- Graphiti MCP/Neo4j/FalkorDB 도입은 선택 사항이다. 기본 템플릿은 로컬 Markdown + JSONL sidecar만으로 동작한다.
 
 ### 스케일 전환 기준
 - 위키 페이지가 **500+** 이상으로 성장하면 index.md만으로 탐색이 비효율적일 수 있다
@@ -749,8 +759,6 @@ v1.15부터 운영 정책을 실제 실행 가능한 CLI와 CI guard로 닫는�
   3. 온톨로지 관계코드가 확장될 때
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
-- 변경 이력: `raw/obsidian/outputs/Owen-WIKI/CHANGELOG.md` (Obsidian 출력 사본) · 외부 git 저장소 `C:\OWEN\Drive\owen-wiki\CHANGELOG.md` (Win) / `/Users/owen/work/owen-wiki/CHANGELOG.md` (macOS)
-- 현재 버전: **v1.16.0** (2026-05-12) — Collection folders 단순화 (articles + Clippings) + Outputs 월별 정책 통합 + scripts/ 통합 + cross-OS 상대경로 정책
-- 경로 동기화**: 템플릿 변경 시 외부 `C:\OWEN\Drive\owen-wiki\` (Win) / `/Users/owen/work/owen-wiki/` (macOS) 갱신한다
-
-
+- 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/github/owen-wiki/CHANGELOG.md` (외부 git 저장소)
+- 현재 버전: **v1.16.0** (2026-05-22) — Temporal Provenance (Graphiti식 ontology sidecar + episode ledger) 반영
+- 경로 동기화**: 템플릿 변경 시 외부 `D:\JAELE\owen-wiki\` (Win) / `/Users/owen/github/owen-wiki/` (macOS) 갱신한다
