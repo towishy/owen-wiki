@@ -58,9 +58,10 @@ my-wiki/
 ├── wiki/                               ← LLM이 관리하는 위키
 │   ├── entities/  concepts/  summaries/  comparisons/  synthesis/
 │   └── ontology/                       ← 관계 그래프
-├── scripts/
-│   ├── wiki-ops/                       ← 운영 대시보드·리포트·metrics JSON
-│   └── graphify-out/                   ← 그래프 시각화 산출물
+├── outputs/
+│   └── wiki-ops/                       ← 운영 대시보드·리포트·metrics JSON
+├── graphify-out/                       ← 그래프 시각화 산출물
+├── scripts/                            ← 운영 자동화 스크립트
 ├── .github/workflows/                  ← CI quality gates
 └── templates/
 ```
