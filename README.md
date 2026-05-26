@@ -4,7 +4,7 @@
 
 # Owen-WIKI Template Kit
 
-![release](https://img.shields.io/badge/release-v1.16.0-0b84d8)
+![release](https://img.shields.io/badge/release-v1.17.0-0b84d8)
 ![license](https://img.shields.io/badge/license-MIT-8cc84b)
 ![LLM Wiki](https://img.shields.io/badge/LLM%20Wiki-Template-6d4df2)
 ![Ontology](https://img.shields.io/badge/Knowledge%20Graph-Ontology-0f9d92)
@@ -17,7 +17,7 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 > **LLM Wiki + Knowledge Graph 온톨로지** 기반의 자기 성장형 지식 관리 시스템 템플릿.
 > 이 킷을 사용하면 Owen의 WIKI 저장소와 동일한 구조의 개인 위키를 구축할 수 있다.
 
-**Version**: 1.16.0 (2026-05-22)
+**Version**: 1.17.0 (2026-05-26)
 
 **Origin**: Owen's LLM Wiki — Microsoft Security 도메인 702 페이지 / 7,451 위키링크 / 740 온톨로지 관계 / 10,097 raw episodes / **Microsoft Security 27/27 제품 커버리지** 운영 경험 기반
 
@@ -26,7 +26,7 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 ---
 
 
-## 14가지 핵심 특징
+## 15가지 핵심 특징
 
 1. **🤖 LLM-Native KB** — AGENTS.md 하나로 인제스트·질의·점검·온톨로지·산출물까지 자율 운영. 사람은 raw 입력과 outputs 검토만.
 2. **📂 3-Layer 분리** — `raw/`(불변 입력) → `wiki/`(LLM 정제) → `outputs/`(공동 산출). 책임 경계가 깔끔.
@@ -40,8 +40,9 @@ Owen-WIKI는 LLM이 대규모 원본 자료를 읽고, 위키·온톨로지·산
 10. **🏗️ Architecture Hardening (v1.14)** — canonical metrics, query-adjusted PageRank, strict sidecar, strict CI로 지표 drift 차단.
 11. **⚙️ Operational Automation (v1.15)** — query router, graph hygiene, metrics snippets, related-to budget, graph delta, registry workbench, release automation.
 12. **⏱️ Temporal Provenance (v1.16)** — Graphiti식 `relation_id`/`episode_id`/`valid_at`/`invalid_at`/raw source lineage를 sidecar와 episode ledger에 기록.
-13. **📊 운영 검증된 스케일** — 669 페이지 / 6,487 위키링크 / 665 온톨로지 관계 / 깨진 링크 0 / 고아 0 — 모두 실측.
-14. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/github/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
+13. **🧭 Agent Behavioral Guardrails (v1.17)** — 가정 노출, 단순성 우선, 최소 변경, 검증 루프로 LLM 작업 품질을 통제.
+14. **📊 운영 검증된 스케일** — 702 페이지 / 7,451 위키링크 / 740 온톨로지 관계 / 10,097 raw episodes / 깨진 링크 0 / 고아 0 — 모두 실측.
+15. **📦 재사용 가능한 템플릿 킷** — 외부 git 저장소(`/Users/owen/github/owen-wiki`)로 분리 배포, 누구나 같은 구조의 LLM Wiki 구축 가능.
 
 ---
 
@@ -113,6 +114,7 @@ raw/
 | **Query Router** | query-adjusted ranking으로 source registry hub를 후순위화 (v1.15) | [wiki-query.py](scripts/wiki-query.py) |
 | **Graph Hygiene** | placeholder/unknown/trailing wikilink 오염 차단 + escaped alias 정규화 (v1.15) | [check-graph-hygiene.py](scripts/check-graph-hygiene.py) + [wiki_utils.py](scripts/wiki_utils.py) |
 | **Release Automation** | 검증·metrics update·commit·tag·GitHub Release 흐름 자동화 (v1.15) | [release-wiki.py](scripts/release-wiki.py) |
+| **에이전트 작업 품질** | 숨은 가정·과잉 설계·주변부 변경·검증 누락을 줄임 (v1.17) | AGENTS.md Agent Behavioral Guardrails |
 | **무결성** | 11종 lint/quality guard 자동화 | tags / ontology / orphans / broken-links / confidence-decay / stubs / graph hygiene / related-to budget / action queue / dashboard / relation quality |
 | **품질 게이트** | PR에서 구조 품질 기준 강제 (v1.9) | [wiki-quality-gates.py](scripts/wiki-quality-gates.py) |
 | **도메인 깊이** | MS Security 100% | 5축 태그 체계 596종 |
@@ -159,7 +161,7 @@ raw/
 | 파일 | 용도 | 행동 |
 |------|------|------|
 | `README.md` | 이 파일 — 전체 가이드 | 읽기 |
-| `AGENTS.md` | LLM 에이전트 스키마 v1.16 (복사하여 사용) | 프로젝트 루트에 복사 |
+| `AGENTS.md` | LLM 에이전트 스키마 v1.17 (복사하여 사용) | 프로젝트 루트에 복사 |
 | `SETUP-GUIDE.md` | 단계별 설정 가이드 | 따라하기 |
 | `CHANGELOG.md` | 템플릿 킷 버전 변경 이력 | 참고 |
 | `templates/` | 위키 페이지 템플릿 5종 | `templates/`에 복사 |

@@ -5,6 +5,23 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.17.0] — 2026-05-26
+
+### Agent Behavioral Guardrails
+
+Karpathy-inspired coding agent guidelines를 템플릿 킷 기본 작업 원칙으로 흡수했다. 목적은 LLM 에이전트가 숨은 가정, 과잉 설계, 주변부 변경, 검증 없는 완료 선언으로 작업 품질을 떨어뜨리는 일을 줄이는 것이다.
+
+**AGENTS.md 변경:**
+- `LLM Agent Behavioral Guardrails (Karpathy-inspired)` 섹션 추가
+- 4가지 공통 행동 기준 명문화: 가정 노출, 단순성 우선, 최소 변경, 검증 루프
+- 코딩, 위키 수정, 문서 생성, 스크립트 자동화에 같은 판단 기준을 적용하도록 설명
+
+**README 변경:**
+- 릴리즈 배지와 버전 표기를 `v1.17.0`으로 갱신
+- 핵심 특징을 15개로 확장하고 Agent Behavioral Guardrails 항목 추가
+- 장점 표에 에이전트 작업 품질 항목 추가
+- AGENTS.md 설명을 v1.17 기준으로 갱신
+
 ## [1.16.0] — 2026-05-22
 
 ### Temporal Provenance + Episode Ledger
