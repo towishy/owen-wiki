@@ -5,7 +5,7 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
-## [1.17.0] — 2026-05-26
+## [1.17] — 2026-05-26
 
 ### Agent Behavioral Guardrails
 
@@ -17,7 +17,7 @@ Karpathy-inspired coding agent guidelines를 템플릿 킷 기본 작업 원칙�
 - 코딩, 위키 수정, 문서 생성, 스크립트 자동화에 같은 판단 기준을 적용하도록 설명
 
 **README 변경:**
-- 릴리즈 배지와 버전 표기를 `v1.17.0`으로 갱신
+- 릴리즈 배지와 버전 표기를 `1.17`로 갱신
 - 핵심 특징을 15개로 확장하고 Agent Behavioral Guardrails 항목 추가
 - 장점 표에 에이전트 작업 품질 항목 추가
 - AGENTS.md 설명을 v1.17 기준으로 갱신
