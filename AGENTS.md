@@ -622,6 +622,8 @@ python3 scripts/extract-raw-sources.py raw/security-onsite-reports raw/extracted
 | `scripts/generate-outputs-backlinks.py` | outputs→wiki 백링크 자동 부여 (`## 파생 산출물`) | wiki 페이지 인플레이스 |
 | `scripts/compute-pagerank.py` | Raw PageRank + query-adjusted rank로 허브/질의 후보 식별 | `outputs/wiki-ops/wiki-pagerank.md` |
 | `scripts/wiki-query.py` | Query-adjusted PageRank·태그·본문·온톨로지 기반 후보 페이지 라우팅 | stdout / `outputs/wiki-ops/query-runs/` |
+| `scripts/wiki-ops-compact.py` | 대형 wiki-ops JSON/JSONL/로그를 CCR-like compact sidecar로 축약 (원문 path+hash 보존) | `outputs/wiki-ops/compact/` |
+| `scripts/wiki-humanize-metrics.py` | 한국어 문체의 번역투·AI 문체 신호를 로컬 deterministic lint로 점검 | `dev/temp/humanize-metrics/` |
 | `scripts/check-graph-hygiene.py` | placeholder/unknown/trailing wikilink로 인한 graph node 오염 탐지 | `outputs/wiki-ops/graph-hygiene.{md,json}` |
 | `scripts/check-related-to-budget.py` | weak `related-to` relation 예산 강제 | stdout / CI exit code |
 | `scripts/update-metrics-snippets.py` | README/AGENTS의 canonical metrics block 자동 갱신 | README.md / AGENTS.md |
@@ -732,6 +734,8 @@ Registry-only 페이지는 기본적으로 답변 본문 근거에서 후순위�
 v1.15부터 운영 정책을 실제 실행 가능한 CLI와 CI guard로 닫는다.
 
 - `wiki-query.py`는 본문·태그·category boost·ontology weight·query-adjusted PageRank를 결합해 질의별 후보 페이지를 산출한다.
+- `wiki-ops-compact.py`는 Headroom식 CCR 원칙을 로컬 스크립트로만 흡수한다. 대형 운영 산출물은 compact Markdown/JSON을 먼저 읽고, 필요한 경우 보존된 source path와 SHA-256으로 원문을 회수한다. 외부 proxy/wrapper 의존성은 기본 운영 경로에 넣지 않는다.
+- `wiki-humanize-metrics.py`는 im-not-ai식 문체 taxonomy를 로컬 deterministic lint로만 적용한다. 자동 rewrite 대신 S1/S2 finding과 예시 span을 sidecar로 남겨 숫자·제품명·인용·코드 보존 후 편집하도록 돕는다.
 - `check-graph-hygiene.py`는 placeholder, unknown target, trailing backslash 등 graph node 오염 원인을 차단하고, table 안의 escaped alias(`\|`)는 정상 alias로 정규화한다.
 - `update-metrics-snippets.py`는 README/AGENTS의 metrics block을 `repo-metrics.json`, relation quality, graph output 기준으로 갱신한다.
 - `check-related-to-budget.py`는 weak `related-to` 예산을 기본 10개로 제한해 relation drift를 CI에서 차단한다.
@@ -773,5 +777,5 @@ Graphiti의 temporal context graph 설계를 Markdown-native 운영에 맞게 �
   4. 페이지 타입이 추가될 때
   5. 스크립트가 업데이트될 때
 - 변경 이력: `outputs/Owen-WIKI/CHANGELOG.md` (워크스페이스 사본) · `/Users/owen/github/owen-wiki/CHANGELOG.md` (외부 git 저장소)
-- 현재 버전: **v1.16.0** (2026-05-22) — Temporal Provenance (Graphiti식 ontology sidecar + episode ledger) 반영
-- 경로 동기화**: 템플릿 변경 시 외부 `D:\JAELE\owen-wiki\` (Win) / `/Users/owen/github/owen-wiki/` (macOS) 갱신한다
+- 현재 버전: **v1.18.0** (2026-06-08) — Context Compaction & Prose Metrics (로컬 compact sidecar + 한국어 문체 lint) 반영
+- **경로 동기화**: 템플릿 변경 시 외부 `C:\OWEN\github\owen-wiki\` (Win) / `/Users/owen/github/owen-wiki/` (macOS) 갱신한다

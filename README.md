@@ -4,7 +4,7 @@
 
 ![Owen AI Document Production Merge Model](assets/owen-ai-document-merged-model.svg)
 
-![release](https://img.shields.io/badge/release-1.17-0b84d8)
+![release](https://img.shields.io/badge/release-1.18-0b84d8)
 ![license](https://img.shields.io/badge/license-MIT-8cc84b)
 ![LLM Wiki](https://img.shields.io/badge/LLM%20Wiki-Template-6d4df2)
 ![Ontology](https://img.shields.io/badge/Knowledge%20Graph-Ontology-0f9d92)
@@ -17,7 +17,7 @@ Owen-WIKI is a Markdown-based knowledge operations template that helps LLM agent
 > A self-growing personal knowledge system template built on **LLM Wiki + Knowledge Graph Ontology**.
 > Use this kit to create a personal wiki with the same operating model as Owen's production WIKI repository.
 
-**Version**: 1.17 (2026-05-26)
+**Version**: 1.18 (2026-06-08)
 
 **Origin**: Based on Owen's LLM Wiki operating experience: 702 Microsoft Security domain pages, 7,451 wikilinks, 740 ontology relations, 10,097 raw episodes, and **27/27 Microsoft Security product coverage**.
 
@@ -25,7 +25,7 @@ Owen-WIKI is a Markdown-based knowledge operations template that helps LLM agent
 
 ---
 
-## 15 Core Features
+## 16 Core Features
 
 1. **🤖 LLM-native knowledge base** — One `AGENTS.md` file defines autonomous ingest, query, lint, ontology, and output workflows. Humans provide raw inputs and review outputs.
 2. **📂 3-layer separation** — `raw/` immutable inputs → `wiki/` LLM-curated knowledge → `outputs/` shared deliverables.
@@ -40,8 +40,9 @@ Owen-WIKI is a Markdown-based knowledge operations template that helps LLM agent
 11. **⚙️ Operational Automation (v1.15)** — Includes query routing, graph hygiene, metrics snippets, related-to budget checks, graph delta reports, registry workbench packets, and release automation.
 12. **⏱️ Temporal Provenance (v1.16)** — Records Graphiti-style `relation_id`, `episode_id`, `valid_at`, `invalid_at`, and raw source lineage in sidecar files and the episode ledger.
 13. **🧭 Agent Behavioral Guardrails (v1.17)** — Uses assumption exposure, simplicity first, minimal change, and verification loops to improve LLM work quality.
-14. **📊 Production-validated scale** — 702 pages, 7,451 wikilinks, 740 ontology relations, 10,097 raw episodes, zero broken links, and zero orphan pages.
-15. **📦 Reusable template kit** — Packaged as an external Git repository so anyone can bootstrap the same LLM Wiki operating model.
+14. **🧩 Context Compaction & Prose Metrics (v1.18)** — Adds local compact-first sidecars for large ops outputs and local Korean prose linting without requiring an external proxy, wrapper, or rewrite model.
+15. **📊 Production-validated scale** — 702 pages, 7,451 wikilinks, 740 ontology relations, 10,097 raw episodes, zero broken links, and zero orphan pages.
+16. **📦 Reusable template kit** — Packaged as an external Git repository so anyone can bootstrap the same LLM Wiki operating model.
 
 ---
 
@@ -113,6 +114,8 @@ In short, the early LLM Wiki is the prototype of an LLM-native Markdown knowledg
 | **Query router** | Downrank registry-only hubs for normal knowledge questions | [wiki-query.py](scripts/wiki-query.py) |
 | **Graph hygiene** | Prevent placeholder, unknown, trailing-link, and escaped-alias graph pollution | [check-graph-hygiene.py](scripts/check-graph-hygiene.py) + [wiki_utils.py](scripts/wiki_utils.py) |
 | **Release automation** | Bundle validation, metrics update, commit, tag, push, and GitHub Release steps with bare numeric release names such as `1.17` | [release-wiki.py](scripts/release-wiki.py) |
+| **Context compaction** | Read compact sidecars for large ops outputs first, then retrieve originals by path and hash when needed | [wiki-ops-compact.py](scripts/wiki-ops-compact.py) |
+| **Korean prose lint** | Detect translationese and AI-style prose signals locally without rewriting source files | [wiki-humanize-metrics.py](scripts/wiki-humanize-metrics.py) |
 | **Agent work quality** | Reduce hidden assumptions, overdesign, unrelated edits, and unverified completion | Agent Behavioral Guardrails in `AGENTS.md` |
 | **Integrity** | Automate structural quality checks | Tags, ontology, orphans, broken links, confidence decay, stubs, graph hygiene, related-to budget, action queue, dashboard, and relation quality |
 | **Quality gates** | Enforce structure in PR workflows | [wiki-quality-gates.py](scripts/wiki-quality-gates.py) |
@@ -166,7 +169,7 @@ For a new wiki project, run `scripts/wiki-stats.py --write-ops` and `scripts/upd
 | `starter-files/` | Starter `index.md`, `log.md`, and `overview.md` files | Copy into the project root |
 | `ontology-templates/` | Starter ontology files | Copy into `wiki/ontology/` |
 
-### Script Catalog (`scripts/`, 50 files)
+### Script Catalog (`scripts/`, 52 files)
 
 #### Core linting and statistics
 
@@ -227,6 +230,13 @@ For a new wiki project, run `scripts/wiki-stats.py --write-ops` and `scripts/upd
 | `analyze-large-hubs.py` | Identify oversized hubs and generate split plans |
 | `build-raw-to-wiki-map.py` | Build raw-to-wiki reference maps and coverage reports |
 | `generate-outputs-backlinks.py` | Add output backlinks to wiki pages |
+
+#### Context compaction and prose metrics
+
+| Script | Purpose |
+| --- | --- |
+| `wiki-ops-compact.py` | Create CCR-like compact Markdown/JSON sidecars for large wiki-ops JSON, JSONL, Markdown, and log outputs while preserving source path and SHA-256 retrieval metadata |
+| `wiki-humanize-metrics.py` | Run stdlib-only local Korean prose lint for translationese, AI-style signals, connector habits, and over-polish risks without rewriting source files |
 
 #### Release, metrics, tags, and folder operations
 

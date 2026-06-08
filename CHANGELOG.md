@@ -5,6 +5,27 @@ Owen의 WIKI 저장소가 발전할 때마다 이 킷도 함께 버전업된다.
 
 ---
 
+## [1.18] — 2026-06-08
+
+### Context Compaction & Prose Metrics
+
+Headroom and im-not-ai were reviewed and adapted as local-first template features. The kit does not add an external proxy, wrapper, hosted API, or automatic rewrite model to the default path; it only adds reusable scripts and operating rules.
+
+**AGENTS.md changes:**
+- Added `wiki-ops-compact.py` and `wiki-humanize-metrics.py` to the operations tool catalog
+- Added a compact-first rule for large wiki-ops outputs: read compact sidecars first, then retrieve originals by source path and SHA-256 when detail is needed
+- Added a local prose-lint rule: use S1/S2 findings and span examples for human/agent editing while preserving numbers, product names, quotes, legal text, and code
+- Updated the current template version to `v1.18.0`
+
+**README changes:**
+- Updated release badge and version to `1.18`
+- Expanded core features to 16 with Context Compaction & Prose Metrics
+- Updated the script catalog to 52 files
+
+**Scripts added:**
+- `wiki-ops-compact.py` — creates compact Markdown/JSON sidecars for large JSON, JSONL, Markdown, and log outputs while preserving source path and SHA-256 retrieval metadata
+- `wiki-humanize-metrics.py` — applies im-not-ai-inspired Korean prose lint locally with stdlib-only deterministic metrics and no source rewriting
+
 ## [1.17] — 2026-05-26
 
 ### Agent Behavioral Guardrails
