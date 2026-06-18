@@ -1,3 +1,5 @@
+![Owen Kit](assets/owen-kit.png)
+
 # Owen-WIKI Template Kit
 
 ![Owen Knowledge Work Stack](assets/owen-knowledge-work-stack.svg)
