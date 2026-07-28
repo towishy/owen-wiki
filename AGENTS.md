@@ -5,6 +5,21 @@
 
 ---
 
+## Wiki Companion Workspace
+
+- `C:\OWEN\github\wiki`를 디자인·지식 참고 루트로 상시 취급한다.
+- UI/UX, 접근성, 반응형 또는 컴포넌트 작업 전 `lib/ui-foundation/`, `lib/ui-lab/src/`, 관련 `lib/ui-foundation/REFERENCE-STUDY-*.md`를 작업 용어로 검색하고 해당 소스를 확인한다.
+- 사용자가 명시적으로 요청하지 않으면 `C:\OWEN\github\wiki`의 파일은 읽기 전용으로 유지한다.
+- `C:\OWEN\github\wiki`에 접근할 수 없으면 추측으로 대체하지 않고, 검증하지 못한 사실을 완료 보고에 명시한다.
+
+---
+
+## Cross-Project UI Foundation
+
+- 디자인/UI 구현 작업을 시작하기 전 `C:\OWEN\github\wiki\lib\ui-foundation`을 읽고, `README.md`, `DESIGN.md`, `tokens/`, `src/`의 컴포넌트 계약을 우선 확인한다.
+
+---
+
 ## 볼트 구조
 
 ```
